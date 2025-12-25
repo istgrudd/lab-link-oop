@@ -1,0 +1,166 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 25 Dec 2025, 21.56.18
+    Author     : Rudi Firdaus
+*/
+
+/* --- GLOBAL STYLES --- */
+body {
+    background-color: #f4f6f9; /* Abu-abu sangat muda, nyaman di mata */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* --- NAVBAR --- */
+.navbar-custom {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); /* Gradasi Biru */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 15px 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    letter-spacing: 1px;
+}
+
+.navbar-text {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-logout {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255,255,255,0.4);
+    color: white;
+}
+
+/* --- CARDS (Kotak Konten) --- */
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Bayangan halus */
+    background-color: white;
+    overflow: hidden; /* Agar sudut tumpul tidak tertutup child element */
+    margin-bottom: 25px;
+}
+
+.card-header-custom {
+    background-color: #ffffff;
+    border-bottom: 2px solid #f0f0f0;
+    padding: 20px 25px;
+    font-weight: 600;
+    color: #0d6efd; /* Warna biru utama */
+    font-size: 1.1rem;
+}
+
+.card-body-custom {
+    padding: 25px;
+}
+
+/* --- FORM ELEMENTS --- */
+.form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); /* Glow biru saat diketik */
+}
+
+/* --- BUTTONS --- */
+.btn-primary-custom {
+    background-color: #0d6efd;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    width: 100%; /* Tombol memenuhi lebar kolom */
+    transition: transform 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-2px); /* Efek naik sedikit saat di-hover */
+}
+
+/* --- TABLE --- */
+.table-custom thead {
+    background-color: #343a40;
+    color: white;
+}
+
+.table-custom th {
+    padding: 15px;
+    font-weight: 500;
+    border: none;
+}
+
+.table-custom td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.badge-role {
+    padding: 8px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ... (kode CSS sebelumnya tetap ada) ... */
+
+/* --- DASHBOARD MENU CARDS --- */
+.card-menu {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    height: 100%; /* Agar tinggi kartu seragam dalam satu baris */
+    text-decoration: none; /* Hilangkan garis bawah pada link */
+    color: inherit; /* Ikuti warna teks default */
+}
+
+.card-menu:hover {
+    transform: translateY(-5px); /* Efek melayang saat di-hover */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: #0d6efd; /* Border berubah biru */
+}
+
+/* Agar teks di dalam kartu tidak berubah jadi biru link saat di-hover */
+a.text-decoration-none:hover .card-title {
+    color: #0d6efd !important; 
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+.card-menu:hover .icon-circle {
+    transform: scale(1.1); /* Ikon membesar sedikit saat kartu di-hover */
+}

@@ -12,10 +12,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.lablink.model.LabMember;
+import javax.servlet.http.HttpSession;
 /**
  *
  * @author Rudi Firdaus
  */
+
 @WebServlet(name = "MemberController", urlPatterns = {"/member"})
 public class MemberController extends HttpServlet {
     // Referensi ke DAO buatan Rudi
@@ -23,45 +27,51 @@ public class MemberController extends HttpServlet {
 
     @Override
     public void init() {
-        // Inisialisasi DAO saat servlet pertama kali jalan
         memberDAO = new MemberDAO();
     }
 
-    // METHOD GET: Dipanggil saat user membuka URL /member (untuk melihat daftar)
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Ambil list member dari Database lewat DAO
+        // 1. CEK SESSION: Apakah sudah login?
+        HttpSession session = request.getSession(false); // false = jangan buat session baru jika tidak ada
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login"); // Tendang ke login
+            return;
+        }
+
+        // 2. Ambil data (Logika lama)
         List<ResearchAssistant> listMember = memberDAO.getAllMembers();
-        
-        // 2. "Titip" data list tersebut ke request agar bisa dibaca di JSP
         request.setAttribute("listRA", listMember);
-        
-        // 3. Oper (Forward) ke halaman View (list-member.jsp) buatan Fathier
         request.getRequestDispatcher("list-member.jsp").forward(request, response);
     }
 
-    // METHOD POST: Dipanggil saat user Submit Form (Simpan Data)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Tangkap inputan user dari Form HTML (nama atribut harus sama dengan di HTML)
+        // 1. CEK HAK AKSES: Hanya 'HEAD_OF_LAB' yang boleh nambah data
+        HttpSession session = request.getSession(false);
+        LabMember currentUser = (LabMember) session.getAttribute("user");
+        
+        if (currentUser == null || !currentUser.getAccessRole().equals("HEAD_OF_LAB")) {
+            // Jika bukan ketua, tolak akses
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Anda tidak memiliki akses untuk menambah data.");
+            return;
+        }
+
+        // 2. Logika Simpan Data (Logika lama, sesuaikan constructor)
         String id = request.getParameter("id");
         String name = request.getParameter("name");
         String division = request.getParameter("division");
         String department = request.getParameter("department");
         String role = request.getParameter("role");
 
-        // 2. Bungkus data ke dalam Objek Model (ResearchAssistant)
-        ResearchAssistant newRA = new ResearchAssistant(id, name, division, department, role);
+        // Constructor baru (param login diisi default/null dulu di controller)
+        ResearchAssistant newRA = new ResearchAssistant(id, name, division, department, role, id, id, "RESEARCH_ASSISTANT");
 
-        // 3. Panggil DAO untuk simpan ke Database
-        boolean success = memberDAO.addMember(newRA);
-
-        // 4. Redirect kembali ke halaman list member
-        // (Gunakan sendRedirect agar URL berubah dan mencegah submit ulang saat refresh)
+        memberDAO.addMember(newRA);
         response.sendRedirect("member"); 
     }
 }

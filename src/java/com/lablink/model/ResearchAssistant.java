@@ -13,8 +13,10 @@ public class ResearchAssistant extends LabMember {
     private String department;     // Misal: Internal
     private String roleTitle;      // Misal: Head of Division
 
-    public ResearchAssistant(String id, String name, String division, String dept, String role) {
-        super(id, name);
+    public ResearchAssistant(String id, String name, String division, String dept, String role, 
+                             String username, String password, String accessRole) {
+        // Oper data login ke superclass
+        super(id, name, username, password, accessRole);
         this.expertDivision = division;
         this.department = dept;
         this.roleTitle = role;
@@ -25,7 +27,7 @@ public class ResearchAssistant extends LabMember {
     public int calculateWorkload() {
         // Logika sederhana: workload dasar 10 jam + bonus jika punya jabatan
         int baseLoad = 10;
-        if (!roleTitle.equalsIgnoreCase("Staff")) {
+        if (roleTitle != null && !roleTitle.equalsIgnoreCase("Staff")) {
             baseLoad += 5;
         }
         return baseLoad;
