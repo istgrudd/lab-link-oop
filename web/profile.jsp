@@ -164,7 +164,7 @@
                     </div>
                     
                     <div class="text-center mt-3">
-                        <a href="member" class="text-decoration-none">&larr; Kembali ke Dashboard</a>
+                        <a href="dashboard" class="text-decoration-none">&larr; Kembali ke Dashboard</a>
                     </div>
                 </div>
 

@@ -14,11 +14,14 @@
     LabMember user = (LabMember) session.getAttribute("user");
     if (user == null) { response.sendRedirect("login.jsp"); return; }
     
-    // --- LOGIKA HAK AKSES BARU ---
+    // --- LOGIKA HAK AKSES ---
     String role = user.getAccessRole();
-    
     // Siapa yang boleh MENGELOLA Proyek? (Admin & Ketua Internal)
     boolean canManageProject = "HEAD_OF_LAB".equals(role) || "HEAD_OF_INTERNAL".equals(role);
+    
+    // [PERBAIKAN SCOPE] Ambil data di sini agar bisa dipakai di FORM ATAS dan TABEL BAWAH
+    List<Project> listP = (List<Project>) request.getAttribute("listProject");
+    List<ResearchAssistant> listM = (List<ResearchAssistant>) request.getAttribute("listMember");
 %>
 
 <!DOCTYPE html>
@@ -77,6 +80,17 @@
                                 <label class="form-label">Nama Proyek</label>
                                 <input type="text" name="name" class="form-control" placeholder="Judul..." required>
                             </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">PM / Lead</label>
+                                <select name="leaderID" class="form-select" required>
+                                    <option value="" selected disabled>Pilih...</option>
+                                    <% if(listM != null) { for(ResearchAssistant ra : listM) { %>
+                                    <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
+                                    <% }} %>
+                                </select>
+                            </div>
+                            
                             <div class="col-md-2">
                                 <label class="form-label">Tipe & Status</label>
                                 <div class="input-group">
@@ -90,8 +104,8 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary-custom w-100">Simpan</button>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary-custom" style="width: auto;">Simpan Proyek</button>
                             </div>
                         </div>
                     </form>
@@ -104,84 +118,111 @@
                     <i class="bi bi-list-task"></i> Daftar Aktivitas Lab
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-custom table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Kode</th>
-                                <th>Divisi</th> <th>Nama Proyek</th>
-                                <th>Tipe</th>
-                                <th>Status</th>
-                                <th>Tim (Member)</th>
-                                <% if (canManageProject) { %> <th>Aksi</th> <% } %>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% 
-                                List<Project> listP = (List<Project>) request.getAttribute("listProject");
-                                List<ResearchAssistant> listM = (List<ResearchAssistant>) request.getAttribute("listMember");
-                                
-                                if (listP != null && !listP.isEmpty()) {
-                                    for (Project p : listP) {
-                            %>
-                            <tr>
-                                <td><%= p.getProjectID() %></td>
-                                
-                                <td>
-                                    <% if("Lintas Divisi".equals(p.getDivision())) { %>
-                                        <span class="badge bg-primary"><i class="bi bi-diagram-3"></i> Lintas Divisi</span>
-                                    <% } else { %>
-                                        <span class="text-secondary fw-bold"><%= p.getDivision() %></span>
-                                    <% } %>
-                                </td>
-
-                                <td class="fw-bold"><%= p.getProjectName() %></td>
-                                
-                                <td><span class="badge bg-secondary"><%= p.getActivityType() %></span></td>
-                                
-                                <td>
-                                    <% if("Ongoing".equals(p.getStatus())) { %>
-                                        <span class="badge bg-warning text-dark">Ongoing</span>
-                                    <% } else { %>
-                                        <span class="badge bg-success">Completed</span>
-                                    <% } %>
-                                </td>
-                                
-                                <td>
-                                    <% for(String memberName : p.getTeamMembers()) { %>
-                                        <span class="badge bg-info text-dark mb-1"><%= memberName %></span>
-                                    <% } %>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0 text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Divisi</th> 
+                                    <th>Nama Proyek</th>
+                                    <th>Leader</th> <th>Tipe</th>
+                                    <th>Status</th>
+                                    <th>Tim (Member)</th>
+                                    <% if (canManageProject) { %> <th>Aksi</th> <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% 
+                                    if (listP != null && !listP.isEmpty()) {
+                                        for (Project p : listP) {
+                                %>
+                                <tr>
+                                    <td><%= p.getProjectID() %></td>
                                     
-                                    <% if (p.getTeamMembers().isEmpty()) { %>
-                                        <small class="text-muted fst-italic">Belum ada tim</small>
-                                    <% } %>
-                                </td>
-                                
-                                <% if (canManageProject) { %>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        
-                                        <a href="project?action=edit&id=<%= p.getProjectID() %>" 
-                                           class="btn btn-sm btn-warning text-white" 
-                                           title="Edit Proyek">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                    <td>
+                                        <% if("Lintas Divisi".equals(p.getDivision())) { %>
+                                            <span class="badge bg-primary"><i class="bi bi-diagram-3"></i> Lintas</span>
+                                        <% } else { %>
+                                            <span class="text-secondary fw-bold"><%= p.getDivision() %></span>
+                                        <% } %>
+                                    </td>
 
-                                        <form action="project" method="post" class="d-flex gap-1">
+                                    <td class="fw-bold"><%= p.getProjectName() %></td>
+                                    
+                                    <td>
+                                        <% if(p.getLeaderName() != null) { %>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-star-fill"></i> <%= p.getLeaderName() %>
+                                            </span>
+                                        <% } else { %> - <% } %>
+                                    </td>
+                                    
+                                    <td><span class="badge bg-secondary"><%= p.getActivityType() %></span></td>
+                                    
+                                    <td>
+                                        <% if("Ongoing".equals(p.getStatus())) { %>
+                                            <span class="badge bg-warning text-dark">Ongoing</span>
+                                        <% } else { %>
+                                            <span class="badge bg-success">Completed</span>
+                                        <% } %>
+                                    </td>
+                                    
+                                    <td>
+                                        <% for(String memberName : p.getTeamMembers()) { %>
+                                            <span class="badge bg-info text-dark mb-1"><%= memberName %></span>
+                                        <% } %>
+                                        
+                                        <% if (p.getTeamMembers().isEmpty()) { %>
+                                            <small class="text-muted fst-italic">Belum ada tim</small>
+                                        <% } %>
+                                    </td>
+                                    
+                                    <% if (canManageProject) { %>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            
+                                            <a href="project?action=edit&id=<%= p.getProjectID() %>" 
+                                               class="btn btn-sm btn-warning text-white" 
+                                               title="Edit Proyek">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        <% if ("Completed".equals(p.getStatus())) { %>
+                                            <a href="archive?action=createFromProject&projectID=<%= p.getProjectID() %>" 
+                                                class="btn btn-sm btn-success text-white" 
+                                                title="Masuk ke Arsip (F4)">
+                                            <i class="bi bi-archive-fill"></i>
+                                            </a>
+                                        <% } %>
+
+                                            <form action="project" method="post" class="d-flex gap-1">
+                                                <input type="hidden" name="action" value="assignMember">
+                                                <input type="hidden" name="projectID" value="<%= p.getProjectID() %>">
+                                                
+                                                <select name="memberID" class="form-select form-select-sm" style="width: 100px;" required>
+                                                    <option value="" selected disabled>+Tim</option>
+                                                    <% if(listM != null) { 
+                                                        for(ResearchAssistant ra : listM) { %>
+                                                        <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
+                                                    <% }} %>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Tambahkan">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
                                             </form>
 
-                                    </div>
-                                </td>
+                                        </div>
+                                    </td>
+                                    <% } %>
+                                </tr>
+                                <% 
+                                        }
+                                    } else { 
+                                %>
+                                <tr><td colspan="<%= canManageProject ? 8 : 7 %>" class="text-center py-4 text-muted">Belum ada proyek terdaftar.</td></tr>
                                 <% } %>
-                            </tr>
-                            <% 
-                                    }
-                                } else { 
-                            %>
-                            <tr><td colspan="<%= canManageProject ? 7 : 6 %>" class="text-center py-4 text-muted">Belum ada proyek terdaftar.</td></tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div> </div>
             </div>
 
         </div>

@@ -107,6 +107,9 @@ public class EventController extends HttpServlet {
             LabEvent e = new LabEvent(id, name, date, picID, "");
             eventDAO.updateEvent(e);
             
+        } else if ("deleteEvent".equals(action)) {
+            String id = request.getParameter("id");
+            eventDAO.deleteEvent(id);
         } else if ("addCommittee".equals(action)) {
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");

@@ -164,3 +164,51 @@ a.text-decoration-none:hover .card-title {
 .card-menu:hover .icon-circle {
     transform: scale(1.1); /* Ikon membesar sedikit saat kartu di-hover */
 }
+
+/* --- PRINT STYLE (F5) --- */
+@media print {
+    /* Sembunyikan elemen yang tidak perlu dicetak */
+    .navbar, .btn, .no-print, footer, .card-header-custom {
+        display: none !important;
+    }
+
+    /* Ubah background jadi putih bersih */
+    body, .card {
+        background-color: white !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Pastikan tabel tercetak rapi */
+    .table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 12px; /* Kecilkan font biar muat banyak */
+    }
+    
+    .table th, .table td {
+        border: 1px solid #000 !important; /* Batas hitam tegas */
+        padding: 5px !important;
+    }
+
+    /* Judul Laporan */
+    .print-title {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    /* Tanda Tangan */
+    .print-signature {
+        display: block !important;
+        float: right;
+        margin-top: 50px;
+        text-align: center;
+        width: 200px;
+    }
+}
+
+/* Sembunyikan elemen cetak di tampilan layar biasa */
+.print-title, .print-signature {
+    display: none;
+}

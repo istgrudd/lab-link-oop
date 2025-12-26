@@ -19,8 +19,7 @@
     boolean canManage = "HEAD_OF_LAB".equals(role) || "HEAD_OF_EXTERNAL".equals(role);
 
     // [PERBAIKAN PENTING] 
-    // Deklarasikan listM DI SINI (Global Scope halaman ini), bukan di dalam if.
-    // Agar bisa dipakai di Form Tambah (atas) DAN di Tabel (bawah).
+    // Deklarasikan listM DI SINI (Global Scope halaman ini)
     List<ResearchAssistant> listM = (List<ResearchAssistant>) request.getAttribute("listMember");
 %>
 
@@ -74,7 +73,6 @@
                                 <select name="picID" class="form-select" required>
                                     <option value="" selected disabled>Pilih PIC...</option>
                                     <% 
-                                        // [PERBAIKAN] Tidak perlu deklarasi List<...> lagi di sini. Langsung pakai listM.
                                         if(listM != null) {
                                             for(ResearchAssistant ra : listM) {
                                     %>
@@ -94,76 +92,78 @@
             <div class="card card-custom">
                 <div class="card-header card-header-custom border-0"><i class="bi bi-calendar-event"></i> Daftar Kegiatan Lab</div>
                 <div class="card-body p-0">
-                    <table class="table table-custom table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Kode</th>
-                                <th>Tanggal</th>
-                                <th>Nama Kegiatan</th>
-                                <th>PIC</th>
-                                <th>Panitia</th>
-                                <% if (canManage) { %> <th>Aksi</th> <% } %>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% 
-                                List<LabEvent> listE = (List<LabEvent>) request.getAttribute("listEvent");
-                                if (listE != null && !listE.isEmpty()) {
-                                    for (LabEvent e : listE) {
-                            %>
-                            <tr>
-                                <td><%= e.getEventID() %></td>
-                                <td><span class="badge bg-light text-dark border"><i class="bi bi-calendar3"></i> <%= e.getEventDate() %></span></td>
-                                <td class="fw-bold"><%= e.getEventName() %></td>
-                                <td>
-                                    <% if(e.getPicName() != null) { %>
-                                        <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> <%= e.getPicName() %></span>
-                                    <% } else { %> - <% } %>
-                                </td>
-                                <td>
-                                    <% for(String com : e.getCommitteeNames()) { %>
-                                        <span class="badge bg-info text-dark mb-1"><%= com %></span>
-                                    <% } %>
-                                </td>
-                                
-                                <% if (canManage) { %>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="event?action=edit&id=<%= e.getEventID() %>" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-square"></i></a>
-                                        
-                                        <form action="event" method="post" class="d-flex gap-1">
-                                            <input type="hidden" name="action" value="addCommittee">
-                                            <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
+                    
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0 text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Tanggal</th>
+                                    <th>Nama Kegiatan</th>
+                                    <th>PIC</th>
+                                    <th>Panitia</th>
+                                    <% if (canManage) { %> <th>Aksi</th> <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% 
+                                    List<LabEvent> listE = (List<LabEvent>) request.getAttribute("listEvent");
+                                    if (listE != null && !listE.isEmpty()) {
+                                        for (LabEvent e : listE) {
+                                %>
+                                <tr>
+                                    <td><%= e.getEventID() %></td>
+                                    <td><span class="badge bg-light text-dark border"><i class="bi bi-calendar3"></i> <%= e.getEventDate() %></span></td>
+                                    <td class="fw-bold"><%= e.getEventName() %></td>
+                                    <td>
+                                        <% if(e.getPicName() != null) { %>
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> <%= e.getPicName() %></span>
+                                        <% } else { %> - <% } %>
+                                    </td>
+                                    <td>
+                                        <% for(String com : e.getCommitteeNames()) { %>
+                                            <span class="badge bg-info text-dark mb-1"><%= com %></span>
+                                        <% } %>
+                                    </td>
+                                    
+                                    <% if (canManage) { %>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="event?action=edit&id=<%= e.getEventID() %>" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-square"></i></a>
                                             
-                                            <select name="memberID" class="form-select form-select-sm" style="width: 100px;" required>
-                                                <option value="" disabled selected>+Tim</option>
-                                                <% if(listM != null) { for(ResearchAssistant ra : listM) { %>
-                                                <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
-                                                <% }} %>
-                                            </select>
+                                            <form action="event" method="post" class="d-flex gap-1">
+                                                <input type="hidden" name="action" value="addCommittee">
+                                                <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
+                                                
+                                                <select name="memberID" class="form-select form-select-sm" style="width: 100px;" required>
+                                                    <option value="" disabled selected>+Tim</option>
+                                                    <% if(listM != null) { for(ResearchAssistant ra : listM) { %>
+                                                    <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
+                                                    <% }} %>
+                                                </select>
 
-                                            <select name="roles" class="form-select form-select-sm" style="width: 100px;" required>
-                                                <option value="" disabled selected>Divisi...</option>
-                                                <option value="Acara">Acara</option>
-                                                <option value="Humas">Humas</option>
-                                                <option value="Logistik">Logistik</option>
-                                                <option value="Media">Media</option>
-                                                <option value="Konsumsi">Konsumsi</option>
-                                                <option value="Anggota">Anggota</option>
-                                            </select>
-                                            
-                                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
+                                                <select name="roles" class="form-select form-select-sm" style="width: 100px;" required>
+                                                    <option value="" disabled selected>Divisi...</option>
+                                                    <option value="Acara">Acara</option>
+                                                    <option value="Humas">Humas</option>
+                                                    <option value="Logistik">Logistik</option>
+                                                    <option value="Media">Media</option>
+                                                    <option value="Konsumsi">Konsumsi</option>
+                                                    <option value="Anggota">Anggota</option>
+                                                </select>
+                                                
+                                                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <% } %>
+                                </tr>
+                                <% }} else { %>
+                                <tr><td colspan="<%= canManage ? 6 : 5 %>" class="text-center py-4 text-muted">Belum ada kegiatan.</td></tr>
                                 <% } %>
-                            </tr>
-                            <% }} else { %>
-                            <tr><td colspan="<%= canManage ? 6 : 5 %>" class="text-center py-4 text-muted">Belum ada kegiatan.</td></tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div> </div>
             </div>
         </div>
     </body>

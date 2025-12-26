@@ -9,16 +9,18 @@
 <%@page import="com.lablink.model.Project"%>
 <%@page import="com.lablink.model.LabMember"%>
 <%@page import="com.lablink.model.ProjectTeamMember"%>
-
-<%
+<%@page import="com.lablink.model.ResearchAssistant"%> <%
     LabMember user = (LabMember) session.getAttribute("user");
     if (user == null) { response.sendRedirect("login.jsp"); return; }
     
     // Ambil data project yang dikirim Controller
     Project p = (Project) request.getAttribute("project");
     
-    // [BARU] Ambil list tim dari atribut request
+    // Ambil list tim dari atribut request
     List<ProjectTeamMember> listTeam = (List<ProjectTeamMember>) request.getAttribute("listTeam");
+
+    // [BARU] Ambil list semua member untuk dropdown Leader
+    List<ResearchAssistant> listMember = (List<ResearchAssistant>) request.getAttribute("listMember");
 
     if (p == null) { response.sendRedirect("project"); return; }
 %>
@@ -43,7 +45,18 @@
                 <div class="col-md-8">
                     
                     <div class="card card-custom">
-                        <div class="card-header card-header-custom">Edit Data Proyek</div>
+                        <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+                            <span>Edit Data Proyek</span>
+                            
+                            <form action="project" method="post" onsubmit="return confirm('Yakin ingin MENGHAPUS proyek ini secara permanen? Data tidak bisa dikembalikan.');">
+                                <input type="hidden" name="action" value="deleteProject">
+                                <input type="hidden" name="id" value="<%= p.getProjectID() %>">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash-fill"></i> Hapus Proyek
+                                </button>
+                            </form>
+                        </div>
+
                         <div class="card-body card-body-custom">
                             
                             <form action="project" method="post">
@@ -58,6 +71,24 @@
                                 <div class="mb-3">
                                     <label class="form-label">Nama Proyek</label>
                                     <input type="text" name="name" class="form-control" value="<%= p.getProjectName() %>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Project Manager / Penulis Utama</label>
+                                    <select name="leaderID" class="form-select" required>
+                                        <option value="" disabled>Pilih Leader...</option>
+                                        <% 
+                                            if(listMember != null) {
+                                            for(ResearchAssistant ra : listMember) { 
+                                                // Cek apakah ID member ini sama dengan leader saat ini?
+                                                String currentLeader = p.getLeaderID();
+                                                boolean isSelected = currentLeader != null && currentLeader.equals(ra.getMemberID());
+                                        %>
+                                        <option value="<%= ra.getMemberID() %>" <%= isSelected ? "selected" : "" %>>
+                                            <%= ra.getName() %>
+                                        </option>
+                                        <% }} %>
+                                    </select>
                                 </div>
 
                                 <div class="row mb-3">

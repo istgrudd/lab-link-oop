@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <a href="#" class="text-decoration-none" onclick="alert('Fitur Arsip (F4) akan segera hadir!')">
+                    <a href="archive" class="text-decoration-none">
                         <div class="card card-custom card-menu">
                             <div class="card-body card-body-custom text-center">
                                 <div class="icon-circle bg-danger text-white mx-auto">
@@ -97,7 +97,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <a href="#" class="text-decoration-none" onclick="alert('Fitur Laporan (F5) akan segera hadir!')">
+                    <a href="report" class="text-decoration-none">
                         <div class="card card-custom card-menu">
                             <div class="card-body card-body-custom text-center">
                                 <div class="icon-circle bg-info text-white mx-auto">

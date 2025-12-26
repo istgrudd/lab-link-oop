@@ -169,4 +169,13 @@ public class EventDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) { return false; }
     }
+    
+    public boolean deleteEvent(String id) {
+        String sql = "DELETE FROM tb_event WHERE event_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
 }

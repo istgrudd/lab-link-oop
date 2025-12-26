@@ -22,6 +22,7 @@
     <head>
         <title>Dashboard - LabLink</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
         <link rel="stylesheet" href="css/style.css"> 
     </head>
     <body>
@@ -53,7 +54,7 @@
         <div class="container">
             
             <% if (user.getAccessRole().equals("HEAD_OF_LAB")) { %>
-            <div class="card card-custom">
+            <div class="card card-custom mb-4">
                 <div class="card-header card-header-custom">
                     + Tambah Anggota Baru
                 </div>
@@ -101,42 +102,44 @@
                 <div class="card-header card-header-custom border-0">
                     Daftar Research Assistant
                 </div>
-                <div class="card-body p-0"> <table class="table table-custom table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nama</th>
-                                <th>Divisi</th>
-                                <th>Departemen</th>
-                                <th>Jabatan</th>
-                                <th>Workload</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% 
-                                List<ResearchAssistant> list = (List<ResearchAssistant>) request.getAttribute("listRA");
-                                if (list != null && !list.isEmpty()) {
-                                    for (ResearchAssistant ra : list) {
-                            %>
-                            <tr>
-                                <td class="fw-bold text-secondary"><%= ra.getMemberID() %></td>
-                                <td class="fw-bold"><%= ra.getName() %></td>
-                                <td><%= ra.getExpertDivision() %></td>
-                                <td><span class="badge bg-secondary"><%= ra.getDepartment() %></span></td>
-                                <td><span class="badge bg-info text-dark badge-role"><%= ra.getRoleTitle() %></span></td>
-                                <td><%= ra.calculateWorkload() %> Jam</td>
-                            </tr>
-                            <% 
-                                    }
-                                } else { 
-                            %>
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">Belum ada data anggota.</td>
-                            </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="card-body p-0"> 
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0 text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama</th>
+                                    <th>Divisi</th>
+                                    <th>Departemen</th>
+                                    <th>Jabatan</th>
+                                    <th>Workload</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% 
+                                    List<ResearchAssistant> list = (List<ResearchAssistant>) request.getAttribute("listRA");
+                                    if (list != null && !list.isEmpty()) {
+                                        for (ResearchAssistant ra : list) {
+                                %>
+                                <tr>
+                                    <td class="fw-bold text-secondary"><%= ra.getMemberID() %></td>
+                                    <td class="fw-bold"><%= ra.getName() %></td>
+                                    <td><%= ra.getExpertDivision() %></td>
+                                    <td><span class="badge bg-secondary"><%= ra.getDepartment() %></span></td>
+                                    <td><span class="badge bg-info text-dark badge-role"><%= ra.getRoleTitle() %></span></td>
+                                    <td><%= ra.calculateWorkload() %> Jam</td>
+                                </tr>
+                                <% 
+                                        }
+                                    } else { 
+                                %>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">Belum ada data anggota.</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div> </div>
             </div>
             
             <div class="text-center text-muted mt-4 mb-5">

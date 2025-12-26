@@ -17,17 +17,18 @@ import java.util.List;
  */
 public class ProjectDAO {
 
-    // CREATE PROYEK
+    // 1. UPDATE: Method addProject
     public boolean addProject(Project p) {
-        // Tambahkan kolom division di query
-        String sql = "INSERT INTO tb_project (project_id, project_name, status, activity_type, division) VALUES (?, ?, ?, ?, ?)";
+        // Tambah kolom leader_id
+        String sql = "INSERT INTO tb_project (project_id, project_name, status, activity_type, division, leader_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, p.getProjectID());
             stmt.setString(2, p.getProjectName());
             stmt.setString(3, p.getStatus());
             stmt.setString(4, p.getActivityType());
-            stmt.setString(5, p.getDivision()); // [BARU] Set parameter ke-5
+            stmt.setString(5, p.getDivision());
+            stmt.setString(6, p.getLeaderID()); // [BARU]
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -49,31 +50,31 @@ public class ProjectDAO {
         }
     }
 
-    // READ ALL PROJECTS (Beserta Anggotanya)
+    // 2. UPDATE: Method getAllProjects (Ambil Nama Leader)
     public List<Project> getAllProjects() {
         List<Project> list = new ArrayList<>();
-        String sql = "SELECT * FROM tb_project";
+        // JOIN ke tb_member untuk ambil nama leader
+        String sql = "SELECT p.*, m.name as leader_name FROM tb_project p " +
+                     "LEFT JOIN tb_member m ON p.leader_id = m.member_id";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                // Masukkan rs.getString("division") ke constructor
                 Project p = new Project(
                     rs.getString("project_id"),
                     rs.getString("project_name"),
                     rs.getString("status"),
                     rs.getString("activity_type"),
-                    rs.getString("division") // [BARU] Ambil dari DB
+                    rs.getString("division"),
+                    rs.getString("leader_id"),     // [BARU]
+                    rs.getString("leader_name")    // [BARU]
                 );
-                
                 p.getTeamMembers().addAll(getTeamMembers(p.getProjectID()));
                 list.add(p);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
 
@@ -94,6 +95,7 @@ public class ProjectDAO {
         return names;
     }
     
+    // 3. UPDATE: Method getProjectById (Untuk Edit)
     public Project getProjectById(String id) {
         String sql = "SELECT * FROM tb_project WHERE project_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -101,38 +103,34 @@ public class ProjectDAO {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
+                // Leader Name dikosongkan dulu tidak apa-apa utk form edit
                 return new Project(
                     rs.getString("project_id"),
                     rs.getString("project_name"),
                     rs.getString("status"),
                     rs.getString("activity_type"),
-                    rs.getString("division")
+                    rs.getString("division"),
+                    rs.getString("leader_id"), // [BARU]
+                    "" 
                 );
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return null;
     }
 
-    // [BARU] Update Data Proyek
+    // 4. UPDATE: Method updateProject
     public boolean updateProject(Project p) {
-        // Query Update semua kolom kecuali ID (ID adalah primary key, biasanya tidak diubah)
-        String sql = "UPDATE tb_project SET project_name = ?, status = ?, activity_type = ?, division = ? WHERE project_id = ?";
+        String sql = "UPDATE tb_project SET project_name=?, status=?, activity_type=?, division=?, leader_id=? WHERE project_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, p.getProjectName());
             stmt.setString(2, p.getStatus());
             stmt.setString(3, p.getActivityType());
             stmt.setString(4, p.getDivision());
-            stmt.setString(5, p.getProjectID()); // WHERE project_id = ...
-            
+            stmt.setString(5, p.getLeaderID()); // [BARU]
+            stmt.setString(6, p.getProjectID());
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        } catch (SQLException e) { return false; }
     }
     
     public List<ProjectTeamMember> getTeamDetails(String projectID) {
@@ -161,6 +159,15 @@ public class ProjectDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, projectID);
             stmt.setString(2, memberID);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+    
+    public boolean deleteProject(String id) {
+        String sql = "DELETE FROM tb_project WHERE project_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) { return false; }
     }

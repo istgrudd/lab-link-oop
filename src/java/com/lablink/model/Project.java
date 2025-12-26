@@ -17,21 +17,25 @@ public class Project implements IReportable {
     private String status;      // Ongoing, Completed
     private String activityType; // Riset, HKI
     private String division;
+    private String leaderID;
+    private String leaderName;
     // List untuk menampung nama/anggota tim (Opsional, untuk display di view)
     private List<String> teamMembers = new ArrayList<>();
 
-    public Project(String id, String name, String status, String type, String division) {
+    public Project(String id, String name, String status, String type, String division, String leaderID, String leaderName) {
         this.projectID = id;
         this.projectName = name;
         this.status = status;
         this.activityType = type;
         this.division = division;
+        this.leaderID = leaderID;
+        this.leaderName = leaderName;
     }
 
     // Implementasi Interface IReportable 
     @Override
     public String generateReportString() {
-        return "Proyek (" + division + "): " + projectName + " [" + status + "]";
+        return "Proyek: " + projectName + " (Lead: " + leaderName + ")";
     }
 
     // Getter Setter
@@ -40,6 +44,8 @@ public class Project implements IReportable {
     public String getStatus() { return status; }
     public String getActivityType() { return activityType; }
     public String getDivision() { return division; }
+    public String getLeaderID() { return leaderID; }
+    public String getLeaderName() { return leaderName; }
     
     public List<String> getTeamMembers() { return teamMembers; }
     public void addTeamMember(String name) { this.teamMembers.add(name); }

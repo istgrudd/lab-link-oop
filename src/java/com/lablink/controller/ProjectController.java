@@ -50,11 +50,13 @@ public class ProjectController extends HttpServlet {
         if ("edit".equals(action)) {
             String id = request.getParameter("id");
             Project p = projectDAO.getProjectById(id);
-            
-            // [BARU] Ambil detail tim
             List<ProjectTeamMember> listTeam = projectDAO.getTeamDetails(id);
-            request.setAttribute("listTeam", listTeam); // Kirim ke JSP
-            
+
+            // [BARU] Ambil semua member untuk Dropdown Leader di Edit Page
+            List<ResearchAssistant> listMember = memberDAO.getAllMembers(); 
+            request.setAttribute("listMember", listMember);
+
+            request.setAttribute("listTeam", listTeam);
             request.setAttribute("project", p);
             request.getRequestDispatcher("edit-project.jsp").forward(request, response);
             return;
@@ -99,9 +101,9 @@ public class ProjectController extends HttpServlet {
             String type = request.getParameter("type");
             String division = request.getParameter("division"); // [BARU] Tangkap Input
 
-            // Buat objek dengan divisi
-            Project p = new Project(id, name, status, type, division);
-            
+            String leaderID = request.getParameter("leaderID"); // [BARU]
+        
+            Project p = new Project(id, name, status, type, division, leaderID, "");
             projectDAO.addProject(p);
 
         } else if ("updateProject".equals(action)) {
@@ -110,9 +112,13 @@ public class ProjectController extends HttpServlet {
             String status = request.getParameter("status");
             String type = request.getParameter("type");
             String division = request.getParameter("division");
-
-            Project p = new Project(id, name, status, type, division);
+            String leaderID = request.getParameter("leaderID"); // [BARU]
+        
+            Project p = new Project(id, name, status, type, division, leaderID, "");
             projectDAO.updateProject(p);
+        } else if ("deleteProject".equals(action)) {
+            String id = request.getParameter("id");
+            projectDAO.deleteProject(id);
         } else if ("assignMember".equals(action)) {
             // ... (Kode assignMember tetap sama) ...
             String projectID = request.getParameter("projectID");
