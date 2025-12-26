@@ -19,10 +19,14 @@ public class Project implements IReportable {
     private String division;
     private String leaderID;
     private String leaderName;
+    
+    private String startDate;
+    private String endDate;
+    
     // List untuk menampung nama/anggota tim (Opsional, untuk display di view)
     private List<String> teamMembers = new ArrayList<>();
 
-    public Project(String id, String name, String status, String type, String division, String leaderID, String leaderName) {
+    public Project(String id, String name, String status, String type, String division, String leaderID, String leaderName, String startDate, String endDate) {
         this.projectID = id;
         this.projectName = name;
         this.status = status;
@@ -30,6 +34,9 @@ public class Project implements IReportable {
         this.division = division;
         this.leaderID = leaderID;
         this.leaderName = leaderName;
+        // [BARU]
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     // Implementasi Interface IReportable 
@@ -46,6 +53,9 @@ public class Project implements IReportable {
     public String getDivision() { return division; }
     public String getLeaderID() { return leaderID; }
     public String getLeaderName() { return leaderName; }
+    
+    public String getStartDate() { return startDate; }
+    public String getEndDate() { return endDate; }
     
     public List<String> getTeamMembers() { return teamMembers; }
     public void addTeamMember(String name) { this.teamMembers.add(name); }

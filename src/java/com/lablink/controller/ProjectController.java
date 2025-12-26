@@ -103,7 +103,11 @@ public class ProjectController extends HttpServlet {
 
             String leaderID = request.getParameter("leaderID"); // [BARU]
         
-            Project p = new Project(id, name, status, type, division, leaderID, "");
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+        
+            // Gunakan constructor baru
+            Project p = new Project(id, name, status, type, division, leaderID, "", startDate, endDate);
             projectDAO.addProject(p);
 
         } else if ("updateProject".equals(action)) {
@@ -114,7 +118,10 @@ public class ProjectController extends HttpServlet {
             String division = request.getParameter("division");
             String leaderID = request.getParameter("leaderID"); // [BARU]
         
-            Project p = new Project(id, name, status, type, division, leaderID, "");
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+        
+            Project p = new Project(id, name, status, type, division, leaderID, "", startDate, endDate);
             projectDAO.updateProject(p);
         } else if ("deleteProject".equals(action)) {
             String id = request.getParameter("id");

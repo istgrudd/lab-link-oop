@@ -62,9 +62,14 @@
                     <form action="project" method="post">
                         <input type="hidden" name="action" value="addProject">
                         <div class="row g-3">
+                            
                             <div class="col-md-2">
                                 <label class="form-label">Kode</label>
                                 <input type="text" name="id" class="form-control" placeholder="PRJ-..." required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nama Proyek</label>
+                                <input type="text" name="name" class="form-control" placeholder="Judul..." required>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Divisi Pemilik</label>
@@ -77,11 +82,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Nama Proyek</label>
-                                <input type="text" name="name" class="form-control" placeholder="Judul..." required>
-                            </div>
-                            
-                            <div class="col-md-2">
                                 <label class="form-label">PM / Lead</label>
                                 <select name="leaderID" class="form-select" required>
                                     <option value="" selected disabled>Pilih...</option>
@@ -90,8 +90,17 @@
                                     <% }} %>
                                 </select>
                             </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="date" name="startDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Target Selesai</label>
+                                <input type="date" name="endDate" class="form-control" required>
+                            </div>
                             
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">Tipe & Status</label>
                                 <div class="input-group">
                                     <select name="type" class="form-select">
@@ -104,8 +113,8 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-12 text-end">
-                                <button type="submit" class="btn btn-primary-custom" style="width: auto;">Simpan Proyek</button>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary-custom w-100">Simpan Proyek</button>
                             </div>
                         </div>
                     </form>
@@ -125,7 +134,8 @@
                                     <th>Kode</th>
                                     <th>Divisi</th> 
                                     <th>Nama Proyek</th>
-                                    <th>Leader</th> <th>Tipe</th>
+                                    <th>Leader</th> 
+                                    <th>Timeline</th> <th>Tipe</th>
                                     <th>Status</th>
                                     <th>Tim (Member)</th>
                                     <% if (canManageProject) { %> <th>Aksi</th> <% } %>
@@ -157,6 +167,11 @@
                                         <% } else { %> - <% } %>
                                     </td>
                                     
+                                    <td>
+                                        <small class="text-muted d-block">Start: <%= p.getStartDate() == null ? "-" : p.getStartDate() %></small>
+                                        <small class="text-muted">End: <%= p.getEndDate() == null ? "-" : p.getEndDate() %></small>
+                                    </td>
+                                    
                                     <td><span class="badge bg-secondary"><%= p.getActivityType() %></span></td>
                                     
                                     <td>
@@ -186,13 +201,14 @@
                                                title="Edit Proyek">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                        <% if ("Completed".equals(p.getStatus())) { %>
-                                            <a href="archive?action=createFromProject&projectID=<%= p.getProjectID() %>" 
-                                                class="btn btn-sm btn-success text-white" 
-                                                title="Masuk ke Arsip (F4)">
-                                            <i class="bi bi-archive-fill"></i>
-                                            </a>
-                                        <% } %>
+
+                                            <% if ("Completed".equals(p.getStatus())) { %>
+                                                <a href="archive?action=createFromProject&projectID=<%= p.getProjectID() %>" 
+                                                   class="btn btn-sm btn-success text-white" 
+                                                   title="Masuk ke Arsip (F4)">
+                                                    <i class="bi bi-archive-fill"></i>
+                                                </a>
+                                            <% } %>
 
                                             <form action="project" method="post" class="d-flex gap-1">
                                                 <input type="hidden" name="action" value="assignMember">
@@ -218,11 +234,12 @@
                                         }
                                     } else { 
                                 %>
-                                <tr><td colspan="<%= canManageProject ? 8 : 7 %>" class="text-center py-4 text-muted">Belum ada proyek terdaftar.</td></tr>
+                                <tr><td colspan="<%= canManageProject ? 9 : 8 %>" class="text-center py-4 text-muted">Belum ada proyek terdaftar.</td></tr>
                                 <% } %>
                             </tbody>
                         </table>
-                    </div> </div>
+                    </div>
+                </div>
             </div>
 
         </div>

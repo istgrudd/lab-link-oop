@@ -19,8 +19,8 @@ public class ProjectDAO {
 
     // 1. UPDATE: Method addProject
     public boolean addProject(Project p) {
-        // Tambah kolom leader_id
-        String sql = "INSERT INTO tb_project (project_id, project_name, status, activity_type, division, leader_id) VALUES (?, ?, ?, ?, ?, ?)";
+        // Tambahkan start_date dan end_date ke query
+        String sql = "INSERT INTO tb_project (project_id, project_name, status, activity_type, division, leader_id, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, p.getProjectID());
@@ -28,7 +28,9 @@ public class ProjectDAO {
             stmt.setString(3, p.getStatus());
             stmt.setString(4, p.getActivityType());
             stmt.setString(5, p.getDivision());
-            stmt.setString(6, p.getLeaderID()); // [BARU]
+            stmt.setString(6, p.getLeaderID());
+            stmt.setString(7, p.getStartDate()); // [BARU]
+            stmt.setString(8, p.getEndDate());   // [BARU]
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,9 +55,9 @@ public class ProjectDAO {
     // 2. UPDATE: Method getAllProjects (Ambil Nama Leader)
     public List<Project> getAllProjects() {
         List<Project> list = new ArrayList<>();
-        // JOIN ke tb_member untuk ambil nama leader
         String sql = "SELECT p.*, m.name as leader_name FROM tb_project p " +
-                     "LEFT JOIN tb_member m ON p.leader_id = m.member_id";
+                     "LEFT JOIN tb_member m ON p.leader_id = m.member_id " +
+                     "ORDER BY p.start_date DESC"; // [OPSIONAL] Urutkan dari proyek terbaru
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -68,8 +70,10 @@ public class ProjectDAO {
                     rs.getString("status"),
                     rs.getString("activity_type"),
                     rs.getString("division"),
-                    rs.getString("leader_id"),     // [BARU]
-                    rs.getString("leader_name")    // [BARU]
+                    rs.getString("leader_id"),
+                    rs.getString("leader_name"),
+                    rs.getString("start_date"), // [BARU] Ambil dari DB
+                    rs.getString("end_date")    // [BARU] Ambil dari DB
                 );
                 p.getTeamMembers().addAll(getTeamMembers(p.getProjectID()));
                 list.add(p);
@@ -103,15 +107,16 @@ public class ProjectDAO {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                // Leader Name dikosongkan dulu tidak apa-apa utk form edit
                 return new Project(
                     rs.getString("project_id"),
                     rs.getString("project_name"),
                     rs.getString("status"),
                     rs.getString("activity_type"),
                     rs.getString("division"),
-                    rs.getString("leader_id"), // [BARU]
-                    "" 
+                    rs.getString("leader_id"),
+                    "", // Leader name kosong tidak apa-apa utk edit
+                    rs.getString("start_date"), // [BARU]
+                    rs.getString("end_date")    // [BARU]
                 );
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -120,15 +125,18 @@ public class ProjectDAO {
 
     // 4. UPDATE: Method updateProject
     public boolean updateProject(Project p) {
-        String sql = "UPDATE tb_project SET project_name=?, status=?, activity_type=?, division=?, leader_id=? WHERE project_id=?";
+        // Tambahkan start_date=?, end_date=?
+        String sql = "UPDATE tb_project SET project_name=?, status=?, activity_type=?, division=?, leader_id=?, start_date=?, end_date=? WHERE project_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, p.getProjectName());
             stmt.setString(2, p.getStatus());
             stmt.setString(3, p.getActivityType());
             stmt.setString(4, p.getDivision());
-            stmt.setString(5, p.getLeaderID()); // [BARU]
-            stmt.setString(6, p.getProjectID());
+            stmt.setString(5, p.getLeaderID());
+            stmt.setString(6, p.getStartDate()); // [BARU]
+            stmt.setString(7, p.getEndDate());   // [BARU]
+            stmt.setString(8, p.getProjectID()); // WHERE id ada di posisi 8 sekarang
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) { return false; }
     }

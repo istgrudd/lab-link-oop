@@ -212,3 +212,84 @@ a.text-decoration-none:hover .card-title {
 .print-title, .print-signature {
     display: none;
 }
+
+/* --- MOBILE BOTTOM NAVIGATION (Langkah 3) --- */
+.bottom-nav {
+    display: none; /* Default sembunyi di Desktop */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 10px 0;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.bottom-nav-item {
+    text-align: center;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.75rem;
+    flex: 1;
+    transition: color 0.3s;
+}
+
+.bottom-nav-item i {
+    display: block;
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+}
+
+.bottom-nav-item:hover, .bottom-nav-item.active {
+    color: #0d6efd; /* Warna Biru Utama */
+    font-weight: bold;
+}
+
+/* --- RESPONSIVE TWEAKS (Tampilan HP) --- */
+@media (max-width: 768px) {
+    /* 1. Tampilkan Bottom Nav */
+    .bottom-nav {
+        display: flex;
+    }
+
+    /* 2. Beri ruang di bawah body agar konten tidak tertutup menu bawah */
+    body {
+        padding-bottom: 80px;
+    }
+
+    /* 3. Sederhanakan Navbar Atas (Sembunyikan User Info & Logout) */
+    /* Logout & Profil pindah ke Bottom Nav atau Profil Page */
+    .navbar-custom .d-flex {
+        display: none !important; 
+    }
+    .navbar-custom .container {
+        justify-content: center; /* Logo jadi di tengah */
+    }
+
+    /* 4. Perkecil Ukuran Kartu Menu agar muat 2 kolom rapi */
+    .card-menu {
+        padding: 10px !important;
+    }
+    .card-menu .card-body {
+        padding: 0.5rem !important;
+        flex-direction: column; /* Icon di atas, Teks di bawah */
+        text-align: center;
+    }
+    .card-menu .icon-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        margin-right: 0 !important; /* Hapus margin kanan */
+        margin-bottom: 8px !important; /* Ganti margin bawah */
+    }
+    .card-menu h6 {
+        font-size: 0.8rem; /* Font Judul Lebih Kecil */
+        margin-bottom: 0 !important;
+    }
+    .card-menu small {
+        display: none; /* Sembunyikan deskripsi kecil di HP biar bersih */
+    }
+}
