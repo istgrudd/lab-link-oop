@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <a href="#" class="text-decoration-none" onclick="alert('Fitur Kegiatan Eksternal (F3) akan segera hadir!')">
+                    <a href="event" class="text-decoration-none">
                         <div class="card card-custom card-menu">
                             <div class="card-body card-body-custom text-center">
                                 <div class="icon-circle bg-warning text-white mx-auto">
