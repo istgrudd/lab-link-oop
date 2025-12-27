@@ -8,6 +8,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.lablink.model.Project"%>
 <%@page import="com.lablink.model.LabMember"%>
+<%@page import="com.lablink.model.ResearchAssistant"%>
 <%@page import="java.time.LocalDate"%>
 <%@page import="java.time.format.DateTimeFormatter"%>
 <%@page import="java.util.Locale"%>
@@ -24,7 +25,8 @@
     boolean canManageProject = !currentUser.getAccessRole().equalsIgnoreCase("HEAD_OF_EXTERNAL");
     
     // Ambil Data dari Controller
-    List<Project> projectList = (List<Project>) request.getAttribute("projectList");
+    List<Project> listP = (List<Project>) request.getAttribute("listProject");
+    List<ResearchAssistant> listM = (List<ResearchAssistant>) request.getAttribute("listMember");
     String errorMessage = (String) request.getAttribute("errorMessage");
 %>
 
@@ -75,7 +77,7 @@
                 <% } %>
 
                 <div class="tasks-section" style="width: 100%;">
-                    <% if (projectList != null && !projectList.isEmpty()) { %>
+                    <% if (listP != null && !listP.isEmpty()) { %>
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: #e0f2f1; text-align: left; color: var(--secondary-color);">
@@ -90,7 +92,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% for (Project p : projectList) { %>
+                                <% for (Project p : listP) { %>
                                 <tr style="border-bottom: 1px solid #eee;">
                                     <td style="padding: 15px; font-weight: 600; color: var(--secondary-color);"><%= p.getProjectName() %></td>
                                     
