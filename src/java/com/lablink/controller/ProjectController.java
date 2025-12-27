@@ -33,44 +33,81 @@ public class ProjectController extends HttpServlet {
         projectDAO = new ProjectDAO();
         memberDAO = new MemberDAO();
     }
+    
+    private boolean isAuthorized(LabMember user) {
+        if (user == null) return false;
+        String role = user.getAccessRole();
+        
+        // ATURAN: Ketua Eksternal DILARANG kelola proyek (Hanya View)
+        if ("HEAD_OF_EXTERNAL".equalsIgnoreCase(role)) {
+            return false;
+        }
+        
+        // Role lain (Ketua Lab, Ketua Internal, Asisten Riset) BOLEH
+        return true;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // 1. Cek Session Login
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
         
+        LabMember user = (LabMember) session.getAttribute("user");
         String action = request.getParameter("action");
 
-        // LOGIKA BARU: Jika action = edit, tampilkan form edit
-        if ("edit".equals(action)) {
-            String id = request.getParameter("id");
-            Project p = projectDAO.getProjectById(id);
-            List<ProjectTeamMember> listTeam = projectDAO.getTeamDetails(id);
-
-            // [BARU] Ambil semua member untuk Dropdown Leader di Edit Page
-            List<ResearchAssistant> listMember = memberDAO.getAllMembers(); 
-            request.setAttribute("listMember", listMember);
-
-            request.setAttribute("listTeam", listTeam);
-            request.setAttribute("project", p);
-            request.getRequestDispatcher("edit-project.jsp").forward(request, response);
-            return;
+        // 2. Cek RBAC untuk aksi Modifikasi (Add/Edit/Delete)
+        if (("add".equals(action) || "edit".equals(action) || "delete".equals(action))) {
+            if (!isAuthorized(user)) {
+                // Jika akses ditolak, kembalikan ke list dengan pesan error
+                request.setAttribute("errorMessage", "Akses Ditolak! Role Anda (" + user.getAccessRole() + ") tidak memiliki izin mengelola Proyek.");
+                
+                // Tetap tampilkan list agar user tidak bingung
+                List<Project> list = projectDAO.getAllProjects();
+                request.setAttribute("projectList", list);
+                request.getRequestDispatcher("list-project.jsp").forward(request, response);
+                return;
+            }
         }
-        
-        // Ambil Data Proyek
-        List<Project> listProject = projectDAO.getAllProjects();
-        request.setAttribute("listProject", listProject);
 
-        // Ambil Data Member (Untuk Form Assign Member)
-        List<ResearchAssistant> listMember = memberDAO.getAllMembers();
-        request.setAttribute("listMember", listMember);
+        // 3. Logika Switch Case
+        switch (action) {
+            case "add":
+                request.getRequestDispatcher("edit-project.jsp").forward(request, response);
+                break;
+                
+            case "edit":
+                String id = request.getParameter("id");
+                Project p = projectDAO.getProjectById(id);
+                List<ProjectTeamMember> listTeam = projectDAO.getTeamDetails(id);
 
-        request.getRequestDispatcher("list-project.jsp").forward(request, response);
+                // [BARU] Ambil semua member untuk Dropdown Leader di Edit Page
+                List<ResearchAssistant> listMember = memberDAO.getAllMembers(); 
+                request.setAttribute("listMember", listMember);
+
+                request.setAttribute("listTeam", listTeam);
+                request.setAttribute("project", p);
+                request.getRequestDispatcher("edit-project.jsp").forward(request, response);
+                break;
+                
+            case "delete":
+                String deleteId = request.getParameter("id");
+                projectDAO.deleteProject(deleteId);
+                response.sendRedirect("project");
+                break;
+                
+            default: // "list"
+                List<Project> listProject = projectDAO.getAllProjects();
+                request.setAttribute("listProject", listProject);
+
+                request.getRequestDispatcher("list-project.jsp").forward(request, response);
+                break;
+        }
     }
 
     @Override
