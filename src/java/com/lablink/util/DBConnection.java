@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @author Rudi Firdaus
  */
 public class DBConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/lablink_db";
+    private static final String URL = "jdbc:mysql://localhost:3306/lablink_eksperimen";
     private static final String USER = "root"; // Sesuaikan user mysql
     private static final String PASS = "Swe3thome14.";     // Sesuaikan password mysql
 

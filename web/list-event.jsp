@@ -30,6 +30,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
         
@@ -166,5 +167,38 @@
                     </div> </div>
             </div>
         </div>
+        <nav class="bottom-nav">
+            <a href="dashboard" class="bottom-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="project" class="bottom-nav-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Proyek</span>
+            </a>
+            <a href="event" class="bottom-nav-item active">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Event</span>
+            </a>
+            <a href="administration.jsp" class="bottom-nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Admin</span>
+            </a>
+            <a href="profile.jsp" class="bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+
+        <script>
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.bottom-nav-item, .sidebar-menu a');
+            
+            navLinks.forEach(link => {
+                if(link.getAttribute('href') !== '#' && currentPath.includes(link.getAttribute('href'))) {
+                    link.classList.add('active'); // Tambahkan class active jika URL cocok
+                }
+            });
+        </script>
     </body>
 </html>
