@@ -43,8 +43,12 @@
                 <a href="report"><i class="fas fa-chart-bar"></i> Laporan</a>
             </li>
             
-            <li class="<%= path.contains("administration.jsp") ? "active" : "" %>">
-                <a href="administration.jsp" class="new-feature"><i class="fas fa-file-alt"></i> Administrasi</a>
+            <li class="<%= path.contains("administration") ? "active" : "" %>">
+                <a href="#" class="new-feature"><i class="fas fa-file-alt"></i> Administrasi</a>
+            </li>
+            
+            <li class="<%= path.contains("profile") ? "active" : "" %>">
+                <a href="profile.jsp"><i class="fas fa-user"></i> Akun</a>
             </li>
         </ul>
     </nav>

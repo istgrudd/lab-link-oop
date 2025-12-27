@@ -36,29 +36,7 @@
     <body>
 
         <div class="dashboard-container">
-            
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h2>LabLink</h2>
-                    <p>Welcome, <%= user.getName() %></p>
-                </div>
-                
-                <nav class="sidebar-menu">
-                    <ul>
-                        <li class="active"><a href="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-                        <li><a href="project"><i class="fas fa-project-diagram"></i> Proyek</a></li>
-                        <li><a href="event"><i class="fas fa-calendar-alt"></i> Event & Kegiatan</a></li>
-                        <li><a href="member"><i class="fas fa-users"></i> Anggota Lab</a></li>
-                        <li><a href="archive"><i class="fas fa-archive"></i> Arsip Output</a></li>
-                        <li><a href="report"><i class="fas fa-chart-bar"></i> Laporan</a></li>
-                        <li><a href="administration.jsp" class="new-feature"><i class="fas fa-file-alt"></i> Administrasi</a></li>
-                    </ul>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <a href="login?action=logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </aside>
+            <jsp:include page="sidebar.jsp" /> 
 
             <main class="main-content">
                 
@@ -168,7 +146,7 @@
                 <i class="fas fa-calendar-alt"></i>
                 <span>Event</span>
             </a>
-            <a href="administration.jsp" class="bottom-nav-item">
+            <a href="#" class="bottom-nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Admin</span>
             </a>
