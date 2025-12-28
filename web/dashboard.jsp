@@ -146,7 +146,7 @@
                 <i class="fas fa-calendar-alt"></i>
                 <span>Event</span>
             </a>
-            <a href="#" class="bottom-nav-item">
+            <a href="#" class="bottom-nav-item" onclick="alert('Fitur Administrasi akan segera hadir!')">
                 <i class="fas fa-file-alt"></i>
                 <span>Admin</span>
             </a>

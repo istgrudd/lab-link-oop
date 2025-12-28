@@ -16,15 +16,17 @@ public class LabEvent implements IReportable {
     private String eventDate; // Format: YYYY-MM-DD
     private String picID;
     private String picName;   // Helper untuk menampilkan nama PIC langsung
+    private String description;
     
     private List<String> committeeNames = new ArrayList<>();
 
-    public LabEvent(String id, String name, String date, String picID, String picName) {
+    public LabEvent(String id, String name, String date, String picID, String picName, String description) {
         this.eventID = id;
         this.eventName = name;
         this.eventDate = date;
         this.picID = picID;
         this.picName = picName;
+        this.description = description;
     }
 
     @Override
@@ -37,7 +39,8 @@ public class LabEvent implements IReportable {
     public String getEventName() { return eventName; }
     public String getEventDate() { return eventDate; }
     public String getPicID() { return picID; }
-    public String getPicName() { return picName; }
+    public String getPicName() { return picName; }public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     
     public List<String> getCommitteeNames() { return committeeNames; }
 }

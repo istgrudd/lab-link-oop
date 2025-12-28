@@ -92,19 +92,21 @@ public class EventController extends HttpServlet {
         if ("addEvent".equals(action)) {
             String id = request.getParameter("id");
             String name = request.getParameter("name");
+            String description = request.getParameter("description");
             String date = request.getParameter("date"); // Format dari input type="date"
             String picID = request.getParameter("picID");
 
-            LabEvent e = new LabEvent(id, name, date, picID, "");
+            LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.addEvent(e);
 
         } else if ("updateEvent".equals(action)) {
             String id = request.getParameter("id");
             String name = request.getParameter("name");
+            String description = request.getParameter("description");
             String date = request.getParameter("date");
             String picID = request.getParameter("picID");
-
-            LabEvent e = new LabEvent(id, name, date, picID, "");
+            
+            LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.updateEvent(e);
             
         } else if ("deleteEvent".equals(action)) {

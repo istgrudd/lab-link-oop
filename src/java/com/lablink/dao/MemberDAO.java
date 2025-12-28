@@ -14,6 +14,13 @@ import java.util.List;
  * @author Rudi Firdaus
  */
 public class MemberDAO {
+    
+    private Connection conn;
+
+    public MemberDAO() {
+        conn = DBConnection.getConnection();
+    }
+    
     // FITUR LOGIN: Mencari user berdasarkan username & password
     public LabMember login(String username, String password) {
         String sql = "SELECT * FROM tb_member WHERE username = ? AND password = ?";
@@ -71,21 +78,84 @@ public class MemberDAO {
             return false;
         }
     }
-
-    // READ: Update mapping result set
-    public List<ResearchAssistant> getAllMembers() {
-        List<ResearchAssistant> listRA = new ArrayList<>();
-        String sql = "SELECT * FROM tb_member WHERE member_type = 'RA'";
-
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                listRA.add(new ResearchAssistant(
+    
+    public boolean updateMember(ResearchAssistant ra) {
+        String sql = "UPDATE tb_member SET name = ?, division = ?, department = ?, role_title = ?, access_role = ? WHERE member_id = ?";
+        
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, ra.getName());
+            stmt.setString(2, ra.getExpertDivision()); // Getter ini mengambil value untuk kolom 'division'
+            stmt.setString(3, ra.getDepartment());
+            stmt.setString(4, ra.getRoleTitle());
+            stmt.setString(5, ra.getAccessRole());
+            stmt.setString(6, ra.getMemberID());
+            
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // Tambahkan ini di MemberDAO.java
+    public boolean deleteMember(String id) {
+        String sql = "DELETE FROM tb_member WHERE member_id = ?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, id);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            // Jika gagal (misal karena constraint FK), print error
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // 2. GET BY ID (Perbaikan Constructor)
+    public ResearchAssistant getMemberById(String id) {
+        ResearchAssistant ra = null;
+        String sql = "SELECT * FROM tb_member WHERE member_id = ?";
+        
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                // SESUAIKAN DENGAN CONSTRUCTOR ResearchAssistant.java ANDA:
+                // (id, name, division, dept, role, username, password, accessRole)
+                ra = new ResearchAssistant(
                     rs.getString("member_id"),
                     rs.getString("name"),
-                    rs.getString("division"),
+                    rs.getString("division"),    // Kolom DB: division
+                    rs.getString("department"),
+                    rs.getString("role_title"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("access_role")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ra;
+    }
+    
+    // 3. GET ALL (Untuk List) - Pastikan constructor di sini juga update
+    public List<ResearchAssistant> getAllMembers() {
+        List<ResearchAssistant> list = new ArrayList<>();
+        String sql = "SELECT * FROM tb_member";
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                list.add(new ResearchAssistant(
+                    rs.getString("member_id"),
+                    rs.getString("name"),
+                    rs.getString("division"), 
                     rs.getString("department"),
                     rs.getString("role_title"),
                     rs.getString("username"),
@@ -96,7 +166,7 @@ public class MemberDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return listRA;
+        return list;
     }
     
     // Method updateProfile yang SUDAH DIMODIFIKASI

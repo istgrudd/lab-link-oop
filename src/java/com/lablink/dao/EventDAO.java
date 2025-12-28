@@ -18,13 +18,14 @@ public class EventDAO {
 
     // CREATE
     public boolean addEvent(LabEvent e) {
-        String sql = "INSERT INTO tb_event (event_id, event_name, event_date, pic_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO tb_event (event_id, event_name, event_date, pic_id, description) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, e.getEventID());
             stmt.setString(2, e.getEventName());
             stmt.setString(3, e.getEventDate());
             stmt.setString(4, e.getPicID());
+            stmt.setString(5, e.getDescription());
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -47,9 +48,10 @@ public class EventDAO {
                 LabEvent e = new LabEvent(
                     rs.getString("event_id"),
                     rs.getString("event_name"),
-                    rs.getString("event_date"),
+                    rs.getString("event_date"), // Pastikan ini urutan ke-3 (Tanggal)
                     rs.getString("pic_id"),
-                    rs.getString("pic_name") // Nama PIC dari hasil Join
+                    rs.getString("pic_name"),   // Pastikan ini urutan ke-5 (Nama PIC)
+                    rs.getString("description") // Pastikan ini urutan ke-6 (Deskripsi)
                 );
                 e.getCommitteeNames().addAll(getCommitteeMembers(e.getEventID()));
                 list.add(e);
@@ -66,8 +68,17 @@ public class EventDAO {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                // Return object (PIC Name bisa null/tidak diambil di sini tidak masalah utk form edit)
-                return new LabEvent(rs.getString("event_id"), rs.getString("event_name"), rs.getString("event_date"), rs.getString("pic_id"), "");
+                // [FIX] Ambil rs.getString("description")
+                // Pastikan urutan parameter sesuai dengan Constructor LabEvent Anda
+                // Asumsi Constructor: (id, name, date, picID, picName, description)
+                return new LabEvent(
+                    rs.getString("event_id"), 
+                    rs.getString("event_name"), 
+                    rs.getString("event_date"), 
+                    rs.getString("pic_id"), 
+                    "", // picName kosong tidak apa-apa untuk edit
+                    rs.getString("description") // [FIX] Jangan "" tapi ambil dari DB
+                );
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return null;
@@ -75,13 +86,14 @@ public class EventDAO {
 
     // UPDATE
     public boolean updateEvent(LabEvent e) {
-        String sql = "UPDATE tb_event SET event_name=?, event_date=?, pic_id=? WHERE event_id=?";
+        String sql = "UPDATE tb_event SET event_name=?, event_date=?, pic_id=?, description=? WHERE event_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, e.getEventName());
             stmt.setString(2, e.getEventDate());
             stmt.setString(3, e.getPicID());
-            stmt.setString(4, e.getEventID());
+            stmt.setString(4, e.getDescription());
+            stmt.setString(5, e.getEventID());
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) { return false; }
     }

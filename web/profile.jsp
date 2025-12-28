@@ -9,14 +9,9 @@
 <%@page import="com.lablink.model.LabMember"%>
 
 <%
-    // Ambil data user dari session
     LabMember userSession = (LabMember) session.getAttribute("user");
-    if (userSession == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+    if (userSession == null) { response.sendRedirect("login.jsp"); return; }
     
-    // Casting agar bisa ambil data spesifik RA (division, dept)
     ResearchAssistant user = null;
     if (userSession instanceof ResearchAssistant) {
         user = (ResearchAssistant) userSession;
@@ -27,182 +22,105 @@
 <html>
     <head>
         <title>Profil Saya - LabLink</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
-        
-        <nav class="navbar navbar-expand-lg navbar-custom mb-5">
-            <div class="container">
-        
-                <a class="navbar-brand" href="dashboard">
-                    <i class="bi bi-diagram-3-fill"></i> LabLink System
-                </a>
+        <div class="dashboard-container">
+            <jsp:include page="sidebar.jsp" />
 
-                <div class="d-flex align-items-center">
-            
-                <a href="dashboard" class="text-white me-3 text-decoration-none">Dashboard</a>
-            
-                <span class="text-white me-3">
-                    Halo, 
-                    <a href="profile" class="text-white text-decoration-none fw-bold" title="Edit Profil">
-                        <%= user.getName() %>
-                    </a>
-                    <span class="badge bg-light text-primary ms-1"><%= user.getAccessRole() %></span>
-                </span>
-                <a href="logout" class="btn btn-sm btn-logout">Logout</a>
-            
-                </div>
-            </div>
-        </nav>
+            <main class="main-content">
+                <header class="top-bar">
+                    <h1>Pengaturan Akun</h1>
+                </header>
 
-        <div class="container">
-            <div class="row">
-                
-                <div class="col-md-8">
-                    <div class="card card-custom">
-                        <div class="card-header card-header-custom">
-                            Edit Profil Saya
-                        </div>
-                        <div class="card-body card-body-custom">
+                <div class="content-split">
+                    <div class="agenda-section">
+                        <h2>Informasi Profil</h2>
+                        <% if (request.getAttribute("msgInfo") != null) { %>
+                             <div style="padding:10px; background:#e8f5e9; color:#2e7d32; border-radius:5px; margin-bottom:10px;">
+                                <%= request.getAttribute("msgInfo") %>
+                            </div>
+                        <% } %>
+                        
+                        <form action="profile" method="post">
+                            <input type="hidden" name="action" value="updateInfo">
                             
-                            <% if (request.getAttribute("msgInfo") != null) { %>
-                                <div class="alert alert-<%= request.getAttribute("msgType") %>">
-                                    <%= request.getAttribute("msgInfo") %>
-                                </div>
-                            <% } %>
-
-                            <form action="profile" method="post">
-                                <input type="hidden" name="action" value="updateInfo">
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Member ID (NIM)</label>
-                                        <input type="text" class="form-control" value="<%= user.getMemberID() %>" disabled readonly>
-                                        <small class="text-muted">ID tidak dapat diubah.</small>
-                                    </div>
-                                    <% 
-                                        boolean isAdmin = "HEAD_OF_LAB".equals(user.getAccessRole());
-                                        
-                                        // Jika Admin, string kosong (""). Jika bukan, "disabled readonly"
-                                        String lockStatus = isAdmin ? "" : "disabled readonly"; 
-                                        
-                                        // Pesan bantuan di bawah input
-                                        String helpText = isAdmin ? "Anda memiliki akses penuh mengubah ini." : "Jabatan diatur oleh Admin.";
-                                        
-                                        // Handle tampilan null agar tidak jelek
-                                        String showJabatan = (user.getRoleTitle() == null) ? "" : user.getRoleTitle();
-                                    %>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label">Jabatan</label>
-                                        
-                                        <input type="text" name="role" class="form-control" 
-                                               value="<%= showJabatan %>" <%= lockStatus %>>
-                                               
-                                        <small class="text-muted"><%= helpText %></small>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Nama Lengkap</label>
-                                    <input type="text" name="name" class="form-control" value="<%= user.getName() %>" required>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Divisi Keahlian</label>
-                                        <select name="division" class="form-select">
-                                            <option value="Big Data" <%= "Big Data".equals(user.getExpertDivision()) ? "selected" : "" %>>Big Data</option>
-                                            <option value="Cyber Security" <%= "Cyber Security".equals(user.getExpertDivision()) ? "selected" : "" %>>Cyber Security</option>
-                                            <option value="GIS" <%= "GIS".equals(user.getExpertDivision()) ? "selected" : "" %>>GIS</option>
-                                            <option value="Game Tech" <%= "Game Tech".equals(user.getExpertDivision()) ? "selected" : "" %>>Game Tech</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Departemen</label>
-                                        <select name="department" class="form-select">
-                                            <option value="Internal" <%= "Internal".equals(user.getDepartment()) ? "selected" : "" %>>Internal</option>
-                                            <option value="Eksternal" <%= "Eksternal".equals(user.getDepartment()) ? "selected" : "" %>>Eksternal</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary-custom">Simpan Perubahan</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card card-custom">
-                        <div class="card-header card-header-custom text-danger">
-                            Ganti Password
-                        </div>
-                        <div class="card-body card-body-custom">
+                            <div style="margin-bottom:15px;">
+                                <label>Member ID</label>
+                                <input type="text" value="<%= user.getMemberID() %>" disabled style="width:100%; padding:10px; background:#eee; border:1px solid #ddd;">
+                            </div>
                             
-                            <% if (request.getAttribute("msgPass") != null) { %>
-                                <div class="alert alert-<%= request.getAttribute("msgTypePass") %>">
-                                    <%= request.getAttribute("msgPass") %>
+                            <div style="margin-bottom:15px;">
+                                <label>Nama Lengkap</label>
+                                <input type="text" name="name" value="<%= user.getName() %>" style="width:100%; padding:10px;" required>
+                            </div>
+                            
+                            <div style="display:flex; gap:15px; margin-bottom:15px;">
+                                <div style="flex:1;">
+                                    <label>Divisi</label>
+                                    <select name="division" style="width:100%; padding:10px;">
+                                        <option value="Big Data" <%= "Big Data".equals(user.getExpertDivision()) ? "selected" : "" %>>Big Data</option>
+                                        <option value="Cyber Security" <%= "Cyber Security".equals(user.getExpertDivision()) ? "selected" : "" %>>Cyber Security</option>
+                                        <option value="GIS" <%= "GIS".equals(user.getExpertDivision()) ? "selected" : "" %>>GIS</option>
+                                        <option value="Game Tech" <%= "Game Tech".equals(user.getExpertDivision()) ? "selected" : "" %>>Game Tech</option>
+                                    </select>
                                 </div>
-                            <% } %>
-
-                            <form action="profile" method="post">
-                                <input type="hidden" name="action" value="changePassword">
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Password Baru</label>
-                                    <input type="password" name="newPassword" class="form-control" required>
+                                <div style="flex:1;">
+                                    <label>Departemen</label>
+                                    <select name="department" style="width:100%; padding:10px;">
+                                        <option value="Internal" <%= "Internal".equals(user.getDepartment()) ? "selected" : "" %>>Internal</option>
+                                        <option value="Eksternal" <%= "Eksternal".equals(user.getDepartment()) ? "selected" : "" %>>Eksternal</option>
+                                    </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Konfirmasi Password</label>
-                                    <input type="password" name="confirmPassword" class="form-control" required>
-                                </div>
-                                <button type="submit" class="btn btn-danger w-100">Update Password</button>
-                            </form>
-                        </div>
+                            </div>
+                            
+                            <button type="submit" class="btn-small" style="background:var(--primary-color); color:white; border:none; padding:10px 20px;">Simpan Profil</button>
+                        </form>
                     </div>
-                    
-                    <div class="text-center mt-3">
-                        <a href="dashboard" class="text-decoration-none">&larr; Kembali ke Dashboard</a>
+
+                    <div class="tasks-section">
+                        <h2>Keamanan</h2>
+                        <% if (request.getAttribute("msgPass") != null) { %>
+                             <div style="padding:10px; background:#ffebee; color:#c62828; border-radius:5px; margin-bottom:10px;">
+                                <%= request.getAttribute("msgPass") %>
+                            </div>
+                        <% } %>
+                        
+                        <form action="profile" method="post">
+                            <input type="hidden" name="action" value="changePassword">
+                            <div style="margin-bottom:15px;">
+                                <label>Password Baru</label>
+                                <input type="password" name="newPassword" style="width:100%; padding:10px;" required>
+                            </div>
+                            <div style="margin-bottom:15px;">
+                                <label>Konfirmasi Password</label>
+                                <input type="password" name="confirmPassword" style="width:100%; padding:10px;" required>
+                            </div>
+                            <button type="submit" class="btn-small" style="background:#ef5350; color:white; border:none; padding:10px 20px;">Ganti Password</button>
+                        </form>
                     </div>
                 </div>
 
-            </div>
+            </main>
         </div>
+        
         <nav class="bottom-nav">
             <a href="dashboard" class="bottom-nav-item">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
+                <i class="fas fa-home"></i> <span>Home</span>
             </a>
             <a href="project" class="bottom-nav-item">
-                <i class="fas fa-project-diagram"></i>
-                <span>Proyek</span>
+                <i class="fas fa-project-diagram"></i> <span>Proyek</span>
             </a>
             <a href="event" class="bottom-nav-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Event</span>
+                <i class="fas fa-calendar-alt"></i> <span>Event</span>
             </a>
-            <a href="administration.jsp" class="bottom-nav-item">
-                <i class="fas fa-file-alt"></i>
-                <span>Admin</span>
+            <a href="#" class="bottom-nav-item" onclick="alert('Fitur Administrasi akan segera hadir!')">
+                <i class="fas fa-file-alt"></i> <span>Admin</span>
             </a>
-            <a href="profile" class="bottom-nav-item active">
-                <i class="fas fa-user"></i>
-                <span>Akun</span>
+            <a href="profile.jsp" class="bottom-nav-item active">
+                <i class="fas fa-user"></i> <span>Akun</span>
             </a>
         </nav>
-
-        <script>
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.bottom-nav-item, .sidebar-menu a');
-            
-            navLinks.forEach(link => {
-                if(link.getAttribute('href') !== '#' && currentPath.includes(link.getAttribute('href'))) {
-                    link.classList.add('active'); // Tambahkan class active jika URL cocok
-                }
-            });
-        </script>
     </body>
 </html>

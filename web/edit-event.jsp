@@ -13,9 +13,7 @@
 <%
     LabEvent e = (LabEvent) request.getAttribute("event");
     List<ResearchAssistant> listMember = (List<ResearchAssistant>) request.getAttribute("listMember");
-    // Ambil list panitia
     List<CommitteeMember> listCom = (List<CommitteeMember>) request.getAttribute("listCommittee");
-    
     if (e == null) { response.sendRedirect("event"); return; }
 %>
 
@@ -23,125 +21,105 @@
 <html>
     <head>
         <title>Edit Kegiatan - LabLink</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"> 
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
-        
-        <nav class="navbar navbar-expand-lg navbar-custom mb-5">
-            <div class="container">
-                <a class="navbar-brand" href="dashboard">LabLink System</a>
-            </div>
-        </nav>
+        <div class="dashboard-container">
+            <jsp:include page="sidebar.jsp" />
 
-        <div class="container mt-5 mb-5">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    
-                    <div class="card card-custom mb-4">
-                        <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-                            <span>Edit Data Kegiatan</span>
+            <main class="main-content">
+                <header class="top-bar">
+                    <h1>Edit Kegiatan: <%= e.getEventName() %></h1>
+                </header>
+
+                <div class="content-split">
+                    <div class="agenda-section">
+                        <h2>Data Utama</h2>
+                        <form action="event" method="post">
+                            <input type="hidden" name="action" value="updateEvent">
+                            <input type="hidden" name="id" value="<%= e.getEventID() %>">
                             
-                            <form action="event" method="post" onsubmit="return confirm('Yakin ingin MENGHAPUS kegiatan ini? Data tidak bisa dikembalikan.');">
-                                <input type="hidden" name="action" value="deleteEvent">
-                                <input type="hidden" name="id" value="<%= e.getEventID() %>">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash-fill"></i> Hapus Kegiatan
-                                </button>
-                            </form>
-                        </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Nama Kegiatan</label>
+                                <input type="text" name="name" value="<%= e.getEventName() %>" style="width:100%; padding:10px;" required>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label>Tanggal</label>
+                                <input type="date" name="date" value="<%= e.getEventDate() %>" style="width:100%; padding:10px;" required>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label>PIC (Penanggung Jawab)</label>
+                                <select name="picID" style="width:100%; padding:10px;" required>
+                                    <% for(ResearchAssistant ra : listMember) { %>
+                                        <option value="<%= ra.getMemberID() %>" <%= ra.getMemberID().equals(e.getPicID()) ? "selected" : "" %>><%= ra.getName() %></option>
+                                    <% } %>
+                                </select>
+                            </div>
 
-                        <div class="card-body card-body-custom">
-                            <form action="event" method="post">
-                                <input type="hidden" name="action" value="updateEvent">
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Kode Event</label>
-                                    <input type="text" name="id" class="form-control" value="<%= e.getEventID() %>" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nama Kegiatan</label>
-                                    <input type="text" name="name" class="form-control" value="<%= e.getEventName() %>" required>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Tanggal</label>
-                                        <input type="date" name="date" class="form-control" value="<%= e.getEventDate() %>" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">PIC</label>
-                                        <select name="picID" class="form-select" required>
-                                            <% for(ResearchAssistant ra : listMember) { 
-                                                boolean isSelected = ra.getMemberID().equals(e.getPicID()); %>
-                                            <option value="<%= ra.getMemberID() %>" <%= isSelected ? "selected" : "" %>><%= ra.getName() %></option>
-                                            <% } %>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <a href="event" class="btn btn-outline-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary-custom" style="width: auto;">Simpan Data Utama</button>
-                                </div>
-                            </form>
-                        </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Deskripsi Kegiatan</label>
+                                <textarea name="description" style="width:100%; padding:10px; height:120px; font-family: inherit; resize: vertical;" placeholder="Tuliskan detail, tujuan, atau catatan kegiatan..."><%= (e.getDescription() != null) ? e.getDescription() : "" %></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-small" style="background:var(--primary-color); color:white; border:none; padding:10px 15px;">Simpan Perubahan</button>
+                            
+                            <a href="event?action=deleteEvent&id=<%= e.getEventID() %>" onclick="return confirm('Hapus kegiatan ini?')" style="color:red; float:right; font-size:0.9rem; margin-top:10px;">Hapus Permanen</a>
+                        </form>
                     </div>
 
-                    <div class="card card-custom">
-                        <div class="card-header card-header-custom bg-light d-flex justify-content-between align-items-center">
-                            <span>Manajemen Panitia</span>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0 align-middle text-nowrap">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th class="ps-4">Nama Anggota</th>
-                                            <th>Divisi / Peran</th>
-                                            <th class="text-end pe-4">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (listCom != null && !listCom.isEmpty()) { 
-                                            for (CommitteeMember cm : listCom) { 
-                                        %>
-                                        <tr>
-                                            <td class="ps-4 fw-bold"><%= cm.getMemberName() %></td>
-                                            <td>
-                                                <form action="event" method="post" class="d-flex align-items-center">
-                                                    <input type="hidden" name="action" value="updateCommitteeRole">
-                                                    <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
-                                                    <input type="hidden" name="memberID" value="<%= cm.getMemberID() %>">
-                                                    
-                                                    <select name="role" class="form-select form-select-sm me-2" style="width: 140px;" onchange="this.form.submit()">
-                                                        <option value="Acara" <%= "Acara".equals(cm.getRole()) ? "selected" : "" %>>Acara</option>
-                                                        <option value="Humas" <%= "Humas".equals(cm.getRole()) ? "selected" : "" %>>Humas</option>
-                                                        <option value="Logistik" <%= "Logistik".equals(cm.getRole()) ? "selected" : "" %>>Logistik</option>
-                                                        <option value="Media" <%= "Media".equals(cm.getRole()) ? "selected" : "" %>>Media</option>
-                                                        <option value="Konsumsi" <%= "Konsumsi".equals(cm.getRole()) ? "selected" : "" %>>Konsumsi</option>
-                                                        <option value="Anggota" <%= "Anggota".equals(cm.getRole()) ? "selected" : "" %>>Anggota</option>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                            <td class="text-end pe-4">
-                                                <form action="event" method="post" onsubmit="return confirm('Hapus <%= cm.getMemberName() %> dari panitia?');">
-                                                    <input type="hidden" name="action" value="removeCommittee">
-                                                    <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
-                                                    <input type="hidden" name="memberID" value="<%= cm.getMemberID() %>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <% }} else { %>
-                                        <tr><td colspan="3" class="text-center py-4 text-muted">Belum ada panitia. Tambahkan di menu utama.</td></tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div> </div>
-                    </div>
+                    <div class="tasks-section">
+                        <h2>Panitia & Tim</h2>
+                        
+                        <form action="event" method="post" style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
+                            <input type="hidden" name="action" value="addCommittee">
+                            <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
+                            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                                <select name="memberID" style="flex:1; padding:5px;" required>
+                                    <option value="" disabled selected>Pilih Anggota</option>
+                                    <% if(listMember != null) { for(ResearchAssistant ra : listMember) { %>
+                                        <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
+                                    <% }} %>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                <select name="role" style="flex:1; padding:5px;" required>
+                                    <option value="Anggota">Anggota</option>
+                                    <option value="Acara">Acara</option>
+                                    <option value="Humas">Humas</option>
+                                    <option value="Logistik">Logistik</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Konsumsi">Konsumsi</option>
+                                </select>
+                                <button type="submit" style="background:var(--secondary-color); color:white; border:none; padding:5px 10px; border-radius:4px;">+</button>
+                            </div>
+                        </form>
 
+                        <ul style="list-style:none; padding:0;">
+                            <% if (listCom != null && !listCom.isEmpty()) { 
+                                for (CommitteeMember cm : listCom) { %>
+                                <li style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;">
+                                    <div>
+                                        <strong><%= cm.getMemberName() %></strong><br>
+                                        <small class="text-muted"><%= cm.getRole() %></small>
+                                    </div>
+                                    <form action="event" method="post" style="margin:0;">
+                                        <input type="hidden" name="action" value="removeCommittee">
+                                        <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
+                                        <input type="hidden" name="memberID" value="<%= cm.getMemberID() %>">
+                                        <button type="submit" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </li>
+                            <% }} else { %>
+                                <li class="text-muted small">Belum ada panitia.</li>
+                            <% } %>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+
+            </main>
         </div>
     </body>
 </html>

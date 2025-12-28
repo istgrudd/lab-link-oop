@@ -17,74 +17,71 @@
 <html>
     <head>
         <title>Arsip & Publikasi - LabLink</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-custom mb-5">
-            <div class="container">
-                <a class="navbar-brand" href="dashboard"><i class="bi bi-diagram-3-fill"></i> LabLink System</a>
-                <div class="d-flex align-items-center">
-                    <a href="dashboard" class="text-white me-3 text-decoration-none">Dashboard</a>
-                    <a href="logout" class="btn btn-sm btn-logout">Logout</a>
-                </div>
-            </div>
-        </nav>
+        <div class="dashboard-container">
+            <jsp:include page="sidebar.jsp" />
 
-        <div class="container">
-            <div class="card card-custom">
-                <div class="card-header card-header-custom border-0">
-                    <i class="bi bi-journal-bookmark-fill"></i> Arsip Publikasi & HKI
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom table-hover mb-0 text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tipe</th>
-                                    <th>Judul</th>
-                                    <th>Jurnal / Badan</th>
-                                    <th>No. Ref (DOI)</th>
-                                    <th>Penulis Utama</th>
-                                    <th>Tanggal</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (listA != null && !listA.isEmpty()) { 
-                                    for (Archive a : listA) { %>
-                                <tr>
-                                    <td><%= a.getArchiveID() %></td>
-                                    <td>
-                                        <% if("Publikasi".equals(a.getType())) { %>
-                                            <span class="badge bg-primary">Publikasi</span>
-                                        <% } else { %>
-                                            <span class="badge bg-success">HKI</span>
-                                        <% } %>
-                                    </td>
-                                    <td class="fw-bold text-wrap" style="max-width: 300px;"><%= a.getTitle() %></td>
-                                    <td><%= a.getPublishLocation() %></td>
-                                    <td><small class="text-muted"><%= a.getReferenceNumber() %></small></td>
-                                    <td><%= a.getAuthorName() %></td>
-                                    <td><%= a.getPublishDate() %></td>
-                                    <td>
-                                        <form action="archive" method="post" onsubmit="return confirm('Hapus arsip ini?');">
-                                            <input type="hidden" name="action" value="deleteArchive">
-                                            <input type="hidden" name="id" value="<%= a.getArchiveID() %>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <% }} else { %>
-                                <tr><td colspan="8" class="text-center py-4">Belum ada arsip.</td></tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+            <main class="main-content">
+                <header class="top-bar">
+                    <div class="welcome-text">
+                        <h1>Arsip Publikasi & HKI</h1>
+                        <p class="text-muted small">Kumpulan output hasil riset laboratorium</p>
                     </div>
+                </header>
+
+                <div class="tasks-section" style="width:100%;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #e0f2f1; text-align: left; color: var(--secondary-color);">
+                                <th style="padding: 15px; border-radius: 8px 0 0 8px;">Tipe</th>
+                                <th style="padding: 15px;">Judul</th>
+                                <th style="padding: 15px;">Lokasi / Jurnal</th>
+                                <th style="padding: 15px;">No. Referensi</th>
+                                <th style="padding: 15px;">Penulis Utama</th>
+                                <th style="padding: 15px;">Tanggal</th>
+                                <th style="padding: 15px; border-radius: 0 8px 8px 0;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (listA != null && !listA.isEmpty()) { 
+                                for (Archive a : listA) { %>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 15px;">
+                                    <% if("Publikasi".equals(a.getType())) { %>
+                                        <span class="badge" style="background:#e3f2fd; color:#1976d2;">Publikasi</span>
+                                    <% } else { %>
+                                        <span class="badge badge-success">HKI</span>
+                                    <% } %>
+                                </td>
+                                <td style="padding: 15px; font-weight:600;"><%= a.getTitle() %></td>
+                                <td style="padding: 15px;"><%= a.getPublishLocation() %></td>
+                                <td style="padding: 15px; color:#666;"><%= a.getReferenceNumber() %></td>
+                                <td style="padding: 15px;"><%= a.getAuthorName() %></td>
+                                <td style="padding: 15px;"><%= a.getPublishDate() %></td>
+                                <td style="padding: 15px;">
+                                     <form action="archive" method="post" onsubmit="return confirm('Hapus arsip ini?');" style="margin:0;">
+                                        <input type="hidden" name="action" value="deleteArchive">
+                                        <input type="hidden" name="id" value="<%= a.getArchiveID() %>">
+                                        <button type="submit" style="background:none; border:none; color:#ef5350; cursor:pointer;" title="Hapus"><i class="fas fa-trash"></i></button>
+                                     </form>
+                                </td>
+                            </tr>
+                            <% }} else { %>
+                            <tr><td colspan="7" class="empty-state">Belum ada arsip tersimpan.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            </main>
         </div>
+        
+        <nav class="bottom-nav">
+             <a href="dashboard" class="bottom-nav-item"><i class="fas fa-home"></i> <span>Home</span></a>
+             <a href="archive" class="bottom-nav-item active"><i class="fas fa-archive"></i> <span>Arsip</span></a>
+             <a href="profile.jsp" class="bottom-nav-item"><i class="fas fa-user"></i> <span>Akun</span></a>
+        </nav>
     </body>
 </html>

@@ -15,14 +15,11 @@
 
 <%
     // 1. Cek Session & Role
-    LabMember currentUser = (LabMember) session.getAttribute("user");
-    if (currentUser == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+    LabMember user = (LabMember) session.getAttribute("user");
+    if (user == null) { response.sendRedirect("login.jsp"); return; }
 
-    // Logic RBAC: Ketua Eksternal TIDAK BOLEH kelola proyek (hanya lihat)
-    boolean canManageProject = !currentUser.getAccessRole().equalsIgnoreCase("HEAD_OF_EXTERNAL");
+    String role = user.getAccessRole();
+    boolean canManageProject = "HEAD_OF_LAB".equals(role) || "HEAD_OF_INTERNAL".equals(role);
     
     // Ambil Data dari Controller
     List<Project> listP = (List<Project>) request.getAttribute("listProject");
@@ -168,7 +165,7 @@
             <a href="event" class="bottom-nav-item">
                 <i class="fas fa-calendar-alt"></i> <span>Event</span>
             </a>
-            <a href="administration.jsp" class="bottom-nav-item">
+            <a href="#" class="bottom-nav-item" onclick="alert('Fitur Administrasi akan segera hadir!')">
                 <i class="fas fa-file-alt"></i> <span>Admin</span>
             </a>
             <a href="profile.jsp" class="bottom-nav-item">

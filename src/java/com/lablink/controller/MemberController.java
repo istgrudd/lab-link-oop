@@ -34,17 +34,27 @@ public class MemberController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. CEK SESSION: Apakah sudah login?
-        HttpSession session = request.getSession(false); // false = jangan buat session baru jika tidak ada
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("login"); // Tendang ke login
-            return;
-        }
+        String action = request.getParameter("action");
 
-        // 2. Ambil data (Logika lama)
-        List<ResearchAssistant> listMember = memberDAO.getAllMembers();
-        request.setAttribute("listRA", listMember);
-        request.getRequestDispatcher("list-member.jsp").forward(request, response);
+        if ("edit".equals(action)) {
+            // TAMPILKAN FORM EDIT
+            String id = request.getParameter("id");
+            ResearchAssistant ra = memberDAO.getMemberById(id);
+            request.setAttribute("member", ra);
+            request.getRequestDispatcher("edit-member.jsp").forward(request, response);
+            
+        } else if ("delete".equals(action)) {
+            // HAPUS MEMBER (Opsional)
+            String id = request.getParameter("id");
+            memberDAO.deleteMember(id);
+            response.sendRedirect("member");
+            
+        } else {
+            // DEFAULT: TAMPILKAN LIST
+            List<ResearchAssistant> list = memberDAO.getAllMembers();
+            request.setAttribute("listRA", list);
+            request.getRequestDispatcher("list-member.jsp").forward(request, response);
+        }
     }
 
     @Override
@@ -55,23 +65,41 @@ public class MemberController extends HttpServlet {
         HttpSession session = request.getSession(false);
         LabMember currentUser = (LabMember) session.getAttribute("user");
         
-        if (currentUser == null || !currentUser.getAccessRole().equals("HEAD_OF_LAB")) {
-            // Jika bukan ketua, tolak akses
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Anda tidak memiliki akses untuk menambah data.");
-            return;
+        String action = request.getParameter("action");
+
+        if ("update".equals(action)) {
+            // AMBIL DATA DARI FORM
+            String id = request.getParameter("id");
+            String name = request.getParameter("name");
+            String division = request.getParameter("division");
+            String dept = request.getParameter("department");
+            String roleTitle = request.getParameter("role"); // Jabatan text
+            String accessRole = request.getParameter("accessRole"); // System Role
+
+            // Buat objek baru untuk update.
+            // Username & Password kita isi string kosong karena updateMember DAO tidak mengubahnya.
+            ResearchAssistant ra = new ResearchAssistant(
+                id, name, division, dept, roleTitle, "", "", accessRole
+            );
+
+            memberDAO.updateMember(ra);
+            response.sendRedirect("member"); // Kembali ke list
+            
+        } else if ("add".equals(action)) {
+            // 2. Logika Simpan Data (Logika lama, sesuaikan constructor)
+            String id = request.getParameter("id");
+            String name = request.getParameter("name");
+            String division = request.getParameter("division");
+            String department = request.getParameter("department");
+            String role = request.getParameter("role");
+
+            // Constructor baru (param login diisi default/null dulu di controller)
+            ResearchAssistant newRA = new ResearchAssistant(id, name, division, department, role, id, id, "RESEARCH_ASSISTANT");
+
+            memberDAO.addMember(newRA);
+            response.sendRedirect("member");
         }
 
-        // 2. Logika Simpan Data (Logika lama, sesuaikan constructor)
-        String id = request.getParameter("id");
-        String name = request.getParameter("name");
-        String division = request.getParameter("division");
-        String department = request.getParameter("department");
-        String role = request.getParameter("role");
-
-        // Constructor baru (param login diisi default/null dulu di controller)
-        ResearchAssistant newRA = new ResearchAssistant(id, name, division, department, role, id, id, "RESEARCH_ASSISTANT");
-
-        memberDAO.addMember(newRA);
-        response.sendRedirect("member"); 
+         
     }
 }
