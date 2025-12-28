@@ -44,7 +44,7 @@
             </li>
             
             <li class="<%= path.contains("administration") ? "active" : "" %>">
-                <a href="#" class="new-feature"><i class="fas fa-file-alt"></i> Administrasi</a>
+                <a href="#" class="new-feature" onclick="alert('Fitur Administrasi akan segera hadir!')"><i class="fas fa-file-alt"></i> Administrasi</a>
             </li>
             
             <li class="<%= path.contains("profile") ? "active" : "" %>">
