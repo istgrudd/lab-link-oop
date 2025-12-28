@@ -115,15 +115,15 @@ public class EventController extends HttpServlet {
         } else if ("addCommittee".equals(action)) {
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");
-            String roles = request.getParameter("role"); // [BARU] Tangkap Role
+            String roles = request.getParameter("roles"); // [BARU] Tangkap Role
             
             // Panggil method DAO yang baru
-            eventDAO.addCommitteeMember(eventID, memberID, role);
+            eventDAO.addCommitteeMember(eventID, memberID, roles);
         } else if ("updateCommitteeRole".equals(action)) {
             // [BARU] Logika Ganti Role
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");
-            String newRole = request.getParameter("role");
+            String newRole = request.getParameter("roles");
             
             eventDAO.updateCommitteeRole(eventID, memberID, newRole);
             // Redirect kembali ke halaman edit (bukan ke list event) agar bisa lanjut edit
