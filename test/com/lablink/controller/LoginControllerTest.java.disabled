@@ -1,0 +1,102 @@
+package com.lablink.controller;
+
+import com.lablink.dao.MemberDAO;
+import com.lablink.model.LabMember;
+import com.lablink.model.ResearchAssistant;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.lablink.dao.MemberDAO;
+import com.lablink.model.LabMember;
+import com.lablink.model.ResearchAssistant;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.junit.Before;
+import org.junit.Test;
+
+// Hapus semua import Mockito yang berhubungan dengan anotasi
+import static org.mockito.Mockito.*;
+
+/**
+ * Unit Test untuk LoginController.
+ * Versi ini menginisialisasi mock secara MANUAL untuk menghindari masalah ClassLoader.
+ */
+public class LoginControllerTest {
+
+    // Deklarasikan field tanpa anotasi @Mock
+    private MemberDAO mockMemberDAO;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private HttpSession session;
+    private RequestDispatcher dispatcher;
+
+    private LoginController loginController;
+
+    @Before
+    public void setUp() throws Exception {
+        // Inisialisasi semua mock object secara manual di sini
+        mockMemberDAO = mock(MemberDAO.class);
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        session = mock(HttpSession.class);
+        dispatcher = mock(RequestDispatcher.class);
+
+        // Inisialisasi controller dengan DAO palsu (mock)
+        loginController = new LoginController(mockMemberDAO);
+
+        // Perintahkan mock 'request' untuk selalu mengembalikan mock 'session'
+        // setiap kali method getSession() dipanggil.
+        when(request.getSession()).thenReturn(session);
+    }
+
+    @Test
+    public void testDoPost_SuccessfulLogin() throws Exception {
+        System.out.println("--- Running test: testDoPost_SuccessfulLogin ---");
+        
+        // 1. Arrange (Atur Skenario)
+        when(request.getParameter("username")).thenReturn("budi");
+        when(request.getParameter("password")).thenReturn("password123");
+
+        LabMember dummyMember = new ResearchAssistant("M001", "Budi", null, null, null, "budi", null, null);
+        when(mockMemberDAO.login("budi", "password123")).thenReturn(dummyMember);
+
+        // 2. Act (Jalankan Method yang Dites)
+        loginController.doPost(request, response);
+
+        // 3. Assert (Verifikasi Hasil)
+        verify(session, times(1)).setAttribute(eq("user"), any(LabMember.class));
+        verify(response, times(1)).sendRedirect("dashboard");
+        verifyNoMoreInteractions(dispatcher);
+        
+        System.out.println(">>> Hasil: Verifikasi login sukses berhasil.");
+    }
+
+    @Test
+    public void testDoPost_FailedLogin() throws Exception {
+        System.out.println("--- Running test: testDoPost_FailedLogin ---");
+        
+        // 1. Arrange (Atur Skenario)
+        when(request.getParameter("username")).thenReturn("salah");
+        when(request.getParameter("password")).thenReturn("salah");
+
+        when(mockMemberDAO.login("salah", "salah")).thenReturn(null);
+        when(request.getRequestDispatcher("login.jsp")).thenReturn(dispatcher);
+
+        // 2. Act (Jalankan Method yang Dites)
+        loginController.doPost(request, response);
+
+        // 3. Assert (Verifikasi Hasil)
+        verify(request, times(1)).setAttribute("error", "Username atau Password salah!");
+        verify(dispatcher, times(1)).forward(request, response);
+        verifyNoInteractions(session);
+        verify(response, never()).sendRedirect(anyString());
+        
+        System.out.println(">>> Hasil: Verifikasi login gagal berhasil.");
+    }
+}
+

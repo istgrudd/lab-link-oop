@@ -21,7 +21,17 @@ import javax.servlet.http.HttpSession;
 
 @WebServlet(name = "LoginController", urlPatterns = {"/login", "/logout"})
 public class LoginController extends HttpServlet {
-    private MemberDAO memberDAO = new MemberDAO();
+    private final MemberDAO memberDAO;
+
+    // Default constructor untuk penggunaan normal oleh Tomcat
+    public LoginController() {
+        this(new MemberDAO());
+    }
+
+    // Constructor untuk testing, memungkinkan injeksi DAO palsu (mock)
+    LoginController(MemberDAO memberDAO) {
+        this.memberDAO = memberDAO;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -30,8 +40,10 @@ public class LoginController extends HttpServlet {
         
         if (path.equals("/logout")) {
             // Hapus session saat logout
-            HttpSession session = request.getSession();
-            session.invalidate();
+            HttpSession session = request.getSession(false); // Jangan buat session baru jika tidak ada
+            if (session != null) {
+                session.invalidate();
+            }
             response.sendRedirect("login.jsp");
         } else {
             // Tampilkan halaman login
