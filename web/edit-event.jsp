@@ -1,91 +1,100 @@
-<%-- 
-    Document   : edit-event
-    Created on : 26 Dec 2025, 00.16.30
-    Author     : Rudi Firdaus
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="com.lablink.model.LabEvent"%>
-<%@page import="com.lablink.model.ResearchAssistant"%>
-<%@page import="com.lablink.model.CommitteeMember"%> 
-<%@page import="java.util.List"%>
-
+﻿<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="com.lablink.model.LabEvent"%>
+<%@ page import="com.lablink.model.ResearchAssistant"%>
+<%@ page import="com.lablink.model.CommitteeMember"%>
+<%@ page import="java.util.List"%>
 <%
     LabEvent e = (LabEvent) request.getAttribute("event");
     List<ResearchAssistant> listMember = (List<ResearchAssistant>) request.getAttribute("listMember");
     List<CommitteeMember> listCom = (List<CommitteeMember>) request.getAttribute("listCommittee");
-    if (e == null) { response.sendRedirect("event"); return; }
+    boolean isEdit = (e != null);
 %>
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Edit Kegiatan - LabLink</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body>
-        <div class="dashboard-container">
-            <jsp:include page="sidebar.jsp" />
-
-            <main class="main-content">
-                <header class="top-bar">
-                    <h1>Edit Kegiatan: <%= e.getEventName() %></h1>
-                </header>
-
-                <div class="content-split">
-                    <div class="agenda-section">
-                        <h2>Data Utama</h2>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= isEdit ? "Edit Kegiatan" : "Tambah Kegiatan" %> - LabLink</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="app-body">
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-section">
+                    <h1 class="page-title"><i class="fas fa-<%= isEdit ? "calendar-edit" : "calendar-plus" %>"></i> <%= isEdit ? "Edit Kegiatan" : "Kegiatan Baru" %></h1>
+                    <p class="page-subtitle"><%= isEdit ? e.getEventName() : "Tambahkan kegiatan eksternal baru" %></p>
+                </div>
+                <div class="top-bar-right"><a href="event" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Kembali</a></div>
+            </header>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-header"><h2><i class="fas fa-edit"></i> Data Utama</h2></div>
+                    <div class="card-body">
                         <form action="event" method="post">
-                            <input type="hidden" name="action" value="updateEvent">
+                            <input type="hidden" name="action" value="<%= isEdit ? "updateEvent" : "addEvent" %>">
+                            <% if (!isEdit) { %>
+                            <div class="form-group">
+                                <label class="form-label">Kode Event <span style="color: var(--danger);">*</span></label>
+                                <input type="text" name="id" class="form-control" placeholder="EVT-001" required>
+                            </div>
+                            <% } else { %>
                             <input type="hidden" name="id" value="<%= e.getEventID() %>">
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label>Nama Kegiatan</label>
-                                <input type="text" name="name" value="<%= e.getEventName() %>" style="width:100%; padding:10px;" required>
+                            <% } %>
+                            <div class="form-group">
+                                <label class="form-label">Nama Kegiatan <span style="color: var(--danger);">*</span></label>
+                                <input type="text" name="name" value="<%= isEdit ? e.getEventName() : "" %>" class="form-control" placeholder="Nama kegiatan" required>
                             </div>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label>Tanggal</label>
-                                <input type="date" name="date" value="<%= e.getEventDate() %>" style="width:100%; padding:10px;" required>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label">Tanggal Pelaksanaan <span style="color: var(--danger);">*</span></label>
+                                    <input type="date" name="date" value="<%= isEdit ? e.getEventDate() : "" %>" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">PIC (Penanggung Jawab) <span style="color: var(--danger);">*</span></label>
+                                    <select name="picID" class="form-control" required>
+                                        <option value="" disabled <%= !isEdit ? "selected" : "" %>>-- Pilih PIC --</option>
+                                        <% if (listMember != null) { for(ResearchAssistant ra : listMember) { %>
+                                        <option value="<%= ra.getMemberID() %>" <%= isEdit && ra.getMemberID().equals(e.getPicID()) ? "selected" : "" %>><%= ra.getName() %></option>
+                                        <% }} %>
+                                    </select>
+                                </div>
                             </div>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label>PIC (Penanggung Jawab)</label>
-                                <select name="picID" style="width:100%; padding:10px;" required>
-                                    <% for(ResearchAssistant ra : listMember) { %>
-                                        <option value="<%= ra.getMemberID() %>" <%= ra.getMemberID().equals(e.getPicID()) ? "selected" : "" %>><%= ra.getName() %></option>
-                                    <% } %>
-                                </select>
+                            <div class="form-group">
+                                <label class="form-label">Deskripsi Kegiatan</label>
+                                <textarea name="description" class="form-control" rows="4" placeholder="Tuliskan detail, tujuan, atau catatan kegiatan..."><%= isEdit && e.getDescription() != null ? e.getDescription() : "" %></textarea>
                             </div>
-
-                            <div style="margin-bottom: 15px;">
-                                <label>Deskripsi Kegiatan</label>
-                                <textarea name="description" style="width:100%; padding:10px; height:120px; font-family: inherit; resize: vertical;" placeholder="Tuliskan detail, tujuan, atau catatan kegiatan..."><%= (e.getDescription() != null) ? e.getDescription() : "" %></textarea>
+                            <div style="display: flex; gap: 12px; justify-content: <%= isEdit ? "space-between" : "flex-end" %>; align-items: center;">
+                                <% if (isEdit) { %>
+                                <a href="event?action=deleteEvent&id=<%= e.getEventID() %>" onclick="return confirm('Hapus kegiatan ini?')" class="btn btn-sm" style="background: var(--danger-light); color: var(--danger);"><i class="fas fa-trash"></i> Hapus Permanen</a>
+                                <% } %>
+                                <div style="display: flex; gap: 12px;">
+                                    <a href="event" class="btn btn-outline">Batal</a>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <%= isEdit ? "Simpan Perubahan" : "Simpan Kegiatan" %></button>
+                                </div>
                             </div>
-
-                            <button type="submit" class="btn-small" style="background:var(--primary-color); color:white; border:none; padding:10px 15px;">Simpan Perubahan</button>
-                            
-                            <a href="event?action=deleteEvent&id=<%= e.getEventID() %>" onclick="return confirm('Hapus kegiatan ini?')" style="color:red; float:right; font-size:0.9rem; margin-top:10px;">Hapus Permanen</a>
                         </form>
                     </div>
-
-                    <div class="tasks-section">
-                        <h2>Panitia & Tim</h2>
-                        
-                        <form action="event" method="post" style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
+                </div>
+                <div class="content-card">
+                    <div class="card-header"><h2><i class="fas fa-users"></i> Panitia & Tim</h2></div>
+                    <div class="card-body">
+                        <% if (isEdit) { %>
+                        <form action="event" method="post" style="background: #f8fafc; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
                             <input type="hidden" name="action" value="addCommittee">
                             <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
-                            <div style="display:flex; gap:5px; margin-bottom:5px;">
-                                <select name="memberID" style="flex:1; padding:5px;" required>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <select name="memberID" class="form-control" required>
                                     <option value="" disabled selected>Pilih Anggota</option>
                                     <% if(listMember != null) { for(ResearchAssistant ra : listMember) { %>
-                                        <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
+                                    <option value="<%= ra.getMemberID() %>"><%= ra.getName() %></option>
                                     <% }} %>
                                 </select>
                             </div>
-                            <div style="display:flex; gap:5px;">
-                                <select name="role" style="flex:1; padding:5px;" required>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="roles" class="form-control" required>
                                     <option value="Anggota">Anggota</option>
                                     <option value="Acara">Acara</option>
                                     <option value="Humas">Humas</option>
@@ -93,33 +102,38 @@
                                     <option value="Media">Media</option>
                                     <option value="Konsumsi">Konsumsi</option>
                                 </select>
-                                <button type="submit" style="background:var(--secondary-color); color:white; border:none; padding:5px 10px; border-radius:4px;">+</button>
+                                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i></button>
                             </div>
                         </form>
-
-                        <ul style="list-style:none; padding:0;">
-                            <% if (listCom != null && !listCom.isEmpty()) { 
-                                for (CommitteeMember cm : listCom) { %>
-                                <li style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:8px 0;">
-                                    <div>
-                                        <strong><%= cm.getMemberName() %></strong><br>
-                                        <small class="text-muted"><%= cm.getRole() %></small>
-                                    </div>
-                                    <form action="event" method="post" style="margin:0;">
-                                        <input type="hidden" name="action" value="removeCommittee">
-                                        <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
-                                        <input type="hidden" name="memberID" value="<%= cm.getMemberID() %>">
-                                        <button type="submit" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                                    </form>
-                                </li>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <% if (listCom != null && !listCom.isEmpty()) { for (CommitteeMember cm : listCom) { %>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; border: 1px solid var(--border-color); border-radius: 10px;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--secondary);"><%= cm.getMemberName() %></div>
+                                    <span class="badge badge-info" style="margin-top: 4px;"><%= cm.getRole() %></span>
+                                </div>
+                                <form action="event" method="post" style="margin: 0;">
+                                    <input type="hidden" name="action" value="removeCommittee">
+                                    <input type="hidden" name="eventID" value="<%= e.getEventID() %>">
+                                    <input type="hidden" name="memberID" value="<%= cm.getMemberID() %>">
+                                    <button type="submit" class="btn btn-sm btn-icon" style="background: var(--danger-light); color: var(--danger);"><i class="fas fa-times"></i></button>
+                                </form>
+                            </div>
                             <% }} else { %>
-                                <li class="text-muted small">Belum ada panitia.</li>
+                            <div class="empty-state" style="padding: 30px;"><i class="fas fa-user-friends"></i><p>Belum ada panitia</p></div>
                             <% } %>
-                        </ul>
+                        </div>
+                        <% } else { %>
+                        <div class="empty-state" style="padding: 40px;">
+                            <i class="fas fa-user-friends"></i>
+                            <p>Panitia dapat ditambahkan setelah kegiatan disimpan</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Simpan kegiatan terlebih dahulu, kemudian edit untuk menambahkan panitia.</p>
+                        </div>
+                        <% } %>
                     </div>
                 </div>
-
-            </main>
-        </div>
-    </body>
+            </div>
+        </main>
+    </div>
+</body>
 </html>

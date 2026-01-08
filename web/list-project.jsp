@@ -1,274 +1,180 @@
-<%-- 
-    Document   : list-project
-    Created on : 25 Dec 2025, 22.50.34
-    Author     : Rudi Firdaus
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.List"%>
-<%@page import="com.lablink.model.Project"%>
-<%@page import="com.lablink.model.LabMember"%>
-<%@page import="com.lablink.model.ResearchAssistant"%>
-<%@page import="java.time.LocalDate"%>
-<%@page import="java.time.format.DateTimeFormatter"%>
-<%@page import="java.util.Locale"%>
-
+﻿<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List"%>
+<%@ page import="com.lablink.model.Project"%>
+<%@ page import="com.lablink.model.LabMember"%>
+<%@ page import="com.lablink.model.ResearchAssistant"%>
 <%
-    // 1. Cek Session & Role
     LabMember user = (LabMember) session.getAttribute("user");
     if (user == null) { response.sendRedirect("login.jsp"); return; }
-
     String role = user.getAccessRole();
     boolean canManageProject = "HEAD_OF_LAB".equals(role) || "HEAD_OF_INTERNAL".equals(role);
-    
-    // Ambil Data dari Controller
     List<Project> listP = (List<Project>) request.getAttribute("listProject");
     String errorMessage = (String) request.getAttribute("errorMessage");
 %>
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Manajemen Proyek - LabLink</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body>
-
-        <div class="dashboard-container">
-            <jsp:include page="sidebar.jsp" /> 
-
-            <main class="main-content">
-                
-                <header class="top-bar">
-                    <div class="welcome-text">
-                        <h1>Manajemen Proyek</h1>
-                        <p class="text-muted small">Daftar dan status proyek riset lab</p>
-                    </div>
-                    
-                    <div class="date-display">
-                        <i class="far fa-calendar-alt me-2"></i>
-                        <% 
-                            LocalDate today = LocalDate.now();
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
-                        %>
-                        <%= today.format(formatter) %>
-                    </div>
-                </header>
-
-                <% if (errorMessage != null) { %>
-                    <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ef9a9a; display: flex; align-items: center;">
-                        <i class="fas fa-exclamation-circle" style="margin-right: 10px; font-size: 1.2rem;"></i> 
-                        <span><%= errorMessage %></span>
-                    </div>
-                <% } %>
-
-                <% if (canManageProject) { %>
-                    <div style="margin-bottom: 20px; text-align: right;">
-                        <a href="project?action=add" class="btn-small" style="background: var(--primary-color); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block;">
-                            <i class="fas fa-plus"></i> Tambah Proyek Baru
-                        </a>
-                    </div>
-                <% } %>
-
-                <div class="tasks-section" style="width: 100%;">
-                    <% if (listP != null && !listP.isEmpty()) { %>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: #e0f2f1; text-align: left; color: var(--secondary-color);">
-                                    <th style="padding: 15px; border-radius: 8px 0 0 8px;">Nama Proyek</th>
-                                    <th style="padding: 15px;">Kategori</th>
-                                    <th style="padding: 15px;">Status</th>
-                                    <th style="padding: 15px;">Deadline</th>
-                                    <th style="padding: 15px; border-radius: 0 8px 8px 0;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (Project p : listP) { 
-                                    // Persiapkan Data untuk Modal (Team Members to String)
-                                    String teamStr = "Belum ada anggota";
-                                    if (p.getTeamMembers() != null && !p.getTeamMembers().isEmpty()) {
-                                        teamStr = String.join(", ", p.getTeamMembers());
-                                    }
-                                %>
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 15px; font-weight: 600; color: var(--secondary-color);"><%= p.getProjectName() %></td>
-                                    
-                                    <td style="padding: 15px;"><%= p.getActivityType() %></td>
-                                    
-                                    <td style="padding: 15px;">
-                                        <span class="badge <%= "Completed".equals(p.getStatus()) ? "badge-success" : "badge-danger" %>">
-                                            <%= p.getStatus() %>
-                                        </span>
-                                    </td>
-                                    <td style="padding: 15px;"><%= p.getEndDate() %></td>
-                                    
-                                    <td style="padding: 15px;">
-                                        <button onclick="showDetail(this)" 
-                                                class="btn-icon"
-                                                data-title="<%= p.getProjectName() %>"
-                                                data-description="<%= p.getDescription() != null ? p.getDescription() : "-" %>"
-                                                data-category="<%= p.getActivityType() %>"
-                                                data-status="<%= p.getStatus() %>"
-                                                data-division="<%= p.getDivision() %>"
-                                                data-leader="<%= p.getLeaderName() != null ? p.getLeaderName() : "Belum ditentukan" %>"
-                                                data-start="<%= p.getStartDate() %>"
-                                                data-end="<%= p.getEndDate() %>"
-                                                data-team="<%= teamStr %>"
-                                                style="background:none; border:none; cursor:pointer; color: var(--primary-color); margin-right: 10px;" 
-                                                title="Lihat Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <% if (canManageProject) { %>
-                                            
-                                            <a href="project?action=edit&id=<%= p.getProjectID() %>" style="color: var(--accent-color); margin-right: 10px;" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            
-                                            <% if ("Completed".equals(p.getStatus())) { %>
-                                                <a href="archive?action=createFromProject&projectID=<%= p.getProjectID() %>" 
-                                                   style="color: #2e7d32; margin-right: 10px;" 
-                                                   title="Arsipkan">
-                                                   <i class="fas fa-file-archive"></i>
-                                                </a>
-                                            <% } %>
-
-                                            <a href="project?action=delete&id=<%= p.getProjectID() %>" style="color: #ef5350;" onclick="return confirm('Yakin hapus proyek ini?')" title="Hapus">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        <% } %>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    <% } else { %>
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                            <p>Belum ada data proyek.</p>
-                        </div>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Proyek - LabLink</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="app-body">
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-section">
+                    <h1 class="page-title"><i class="fas fa-project-diagram"></i> Manajemen Proyek</h1>
+                    <p class="page-subtitle">Daftar dan status proyek riset laboratorium</p>
+                </div>
+                <div class="top-bar-right">
+                    <% if (canManageProject) { %>
+                    <a href="project?action=add" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Proyek</a>
                     <% } %>
                 </div>
-
-            </main>
-        </div>
-
-        <nav class="bottom-nav">
-            <a href="dashboard" class="bottom-nav-item">
-                <i class="fas fa-home"></i> <span>Home</span>
-            </a>
-            <a href="project" class="bottom-nav-item active">
-                <i class="fas fa-project-diagram"></i> <span>Proyek</span>
-            </a>
-            <a href="event" class="bottom-nav-item">
-                <i class="fas fa-calendar-alt"></i> <span>Event</span>
-            </a>
-            <a href="#" class="bottom-nav-item" onclick="alert('Fitur Administrasi akan segera hadir!')">
-                <i class="fas fa-file-alt"></i> <span>Admin</span>
-            </a>
-            <a href="profile.jsp" class="bottom-nav-item">
-                <i class="fas fa-user"></i> <span>Akun</span>
-            </a>
-        </nav>
-
-        <div id="projectModal" class="modal-overlay">
-            <div class="modal-card">
-                <div class="modal-header">
-                    <h3>Detail Proyek</h3>
-                    <button class="close-btn" onclick="closeModal()">&times;</button>
+            </header>
+            <% if (errorMessage != null) { %>
+            <div class="alert alert-danger" style="margin-bottom: 20px;"><i class="fas fa-exclamation-circle"></i> <%= errorMessage %></div>
+            <% } %>
+            
+            <!-- Search & Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Cari proyek atau ketua..." onkeyup="filterTable()">
                 </div>
-                <div class="modal-body">
-                    <div class="detail-row">
-                        <span class="detail-label">Nama Proyek</span>
-                        <span class="detail-value" id="mTitle"></span>
+                <select class="filter-dropdown" id="statusFilter" onchange="filterTable()">
+                    <option value="">Semua Status</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <select class="filter-dropdown" id="divisionFilter" onchange="filterTable()">
+                    <option value="">Semua Divisi</option>
+                    <option value="Big Data">Big Data</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="GIS">GIS</option>
+                    <option value="Game Tech">Game Tech</option>
+                </select>
+                <span class="search-result-info" id="resultInfo"></span>
+            </div>
+            
+            <div class="content-card">
+                <div class="card-body" style="padding: 0;">
+                    <% if (listP != null && !listP.isEmpty()) { %>
+                    <table class="data-table" id="projectTable">
+                        <thead>
+                            <tr><th>Nama Proyek</th><th>Kategori</th><th>Divisi</th><th>Status</th><th>Deadline</th><th>Aksi</th></tr>
+                        </thead>
+                        <tbody>
+                            <% for (Project p : listP) { 
+                                String teamStr = "Belum ada anggota";
+                                if (p.getTeamMembers() != null && !p.getTeamMembers().isEmpty()) {
+                                    teamStr = String.join(", ", p.getTeamMembers());
+                                }
+                            %>
+                            <tr data-name="<%= p.getProjectName().toLowerCase() %>" data-status="<%= p.getStatus() %>" data-division="<%= p.getDivision() %>" data-leader="<%= p.getLeaderName() != null ? p.getLeaderName().toLowerCase() : "" %>">
+                                <td>
+                                    <div style="font-weight: 600; color: var(--secondary);"><%= p.getProjectName() %></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);"><%= p.getLeaderName() != null ? "Leader: " + p.getLeaderName() : "" %></div>
+                                </td>
+                                <td><span class="badge badge-info"><%= p.getActivityType() %></span></td>
+                                <td><%= p.getDivision() %></td>
+                                <td><span class="badge <%= "Completed".equals(p.getStatus()) ? "badge-success" : "badge-warning" %>"><i class="fas <%= "Completed".equals(p.getStatus()) ? "fa-check-circle" : "fa-clock" %>"></i> <%= p.getStatus() %></span></td>
+                                <td><%= p.getEndDate() %></td>
+                                <td>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="showDetail(this)" class="btn btn-outline btn-sm btn-icon" data-title="<%= p.getProjectName() %>" data-description="<%= p.getDescription() != null ? p.getDescription() : "-" %>" data-category="<%= p.getActivityType() %>" data-status="<%= p.getStatus() %>" data-division="<%= p.getDivision() %>" data-leader="<%= p.getLeaderName() != null ? p.getLeaderName() : "Belum ditentukan" %>" data-start="<%= p.getStartDate() %>" data-end="<%= p.getEndDate() %>" data-team="<%= teamStr %>" title="Detail"><i class="fas fa-eye"></i></button>
+                                        <% if (canManageProject) { %>
+                                        <a href="project?action=edit&id=<%= p.getProjectID() %>" class="btn btn-outline btn-sm btn-icon" title="Edit"><i class="fas fa-edit"></i></a>
+                                        <% if ("Completed".equals(p.getStatus())) { %>
+                                        <a href="archive?action=createFromProject&projectID=<%= p.getProjectID() %>" class="btn btn-sm btn-icon" style="background: var(--success-light); color: var(--success);" title="Arsipkan"><i class="fas fa-file-archive"></i></a>
+                                        <% } %>
+                                        <a href="project?action=delete&id=<%= p.getProjectID() %>" onclick="return confirm('Yakin hapus proyek ini?')" class="btn btn-sm btn-icon" style="background: var(--danger-light); color: var(--danger);" title="Hapus"><i class="fas fa-trash"></i></a>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    <div id="noResults" class="no-results" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada proyek yang cocok dengan pencarian</p>
                     </div>
-                    
-                    <div class="detail-row">
-                        <span class="detail-label">Deskripsi</span>
-                        <span class="detail-value" id="mDescription"></span>
+                    <% } else { %>
+                    <div class="empty-state" style="padding: 60px 20px;">
+                        <i class="fas fa-folder-open"></i>
+                        <p>Belum ada data proyek</p>
+                        <% if (canManageProject) { %><a href="project?action=add" class="btn btn-primary btn-sm" style="margin-top: 16px;"><i class="fas fa-plus"></i> Tambah Proyek Pertama</a><% } %>
                     </div>
-                    
-                    <div class="detail-row" style="display: flex; gap: 20px;">
-                        <div style="flex: 1;">
-                            <span class="detail-label">Kategori</span>
-                            <span class="detail-value" id="mCategory"></span>
-                        </div>
-                        <div style="flex: 1;">
-                            <span class="detail-label">Divisi</span>
-                            <span class="detail-value" id="mDivision"></span>
-                        </div>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Ketua Tim (Leader)</span>
-                        <span class="detail-value" id="mLeader" style="color: var(--primary-color);"></span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Anggota Tim</span>
-                        <span class="detail-value" id="mTeam" style="line-height: 1.5;"></span>
-                    </div>
-
-                    <div class="detail-row" style="display: flex; gap: 20px;">
-                        <div style="flex: 1;">
-                            <span class="detail-label">Mulai</span>
-                            <span class="detail-value" id="mStart"></span>
-                        </div>
-                        <div style="flex: 1;">
-                            <span class="detail-label">Deadline</span>
-                            <span class="detail-value" id="mEnd" style="color: #d32f2f;"></span>
-                        </div>
-                    </div>
-
-                    <div class="detail-row" style="border: none;">
-                        <span class="detail-label">Status Saat Ini</span>
-                        <span id="mStatusBadge" class="badge"></span>
-                    </div>
+                    <% } %>
                 </div>
             </div>
+        </main>
+    </div>
+    <div id="projectModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header"><h3><i class="fas fa-project-diagram"></i> Detail Proyek</h3><button class="close-btn" onclick="closeModal()">&times;</button></div>
+            <div class="modal-body">
+                <div class="detail-row"><span class="detail-label">Nama Proyek</span><span class="detail-value" id="mTitle"></span></div>
+                <div class="detail-row"><span class="detail-label">Deskripsi</span><span class="detail-value" id="mDescription"></span></div>
+                <div class="detail-row"><span class="detail-label">Kategori</span><span class="detail-value" id="mCategory"></span></div>
+                <div class="detail-row"><span class="detail-label">Divisi</span><span class="detail-value" id="mDivision"></span></div>
+                <div class="detail-row"><span class="detail-label">Ketua Tim (Leader)</span><span class="detail-value" id="mLeader"></span></div>
+                <div class="detail-row"><span class="detail-label">Anggota Tim</span><span class="detail-value" id="mTeam"></span></div>
+                <div class="detail-row"><span class="detail-label">Tanggal Mulai</span><span class="detail-value" id="mStart"></span></div>
+                <div class="detail-row"><span class="detail-label">Deadline</span><span class="detail-value" id="mEnd"></span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" id="mStatusBadge"></span></div>
+            </div>
         </div>
-
-        <script>
-            function showDetail(btn) {
-                // Ambil data dari atribut tombol
-                document.getElementById('mTitle').innerText = btn.getAttribute('data-title');
-                document.getElementById('mDescription').innerText = btn.getAttribute('data-description');
-                document.getElementById('mCategory').innerText = btn.getAttribute('data-category');
-                document.getElementById('mDivision').innerText = btn.getAttribute('data-division');
-                document.getElementById('mLeader').innerText = btn.getAttribute('data-leader');
-                document.getElementById('mTeam').innerText = btn.getAttribute('data-team');
-                document.getElementById('mStart').innerText = btn.getAttribute('data-start');
-                document.getElementById('mEnd').innerText = btn.getAttribute('data-end');
+    </div>
+    <script>
+        function showDetail(btn) {
+            document.getElementById('mTitle').innerText = btn.getAttribute('data-title');
+            document.getElementById('mDescription').innerText = btn.getAttribute('data-description');
+            document.getElementById('mCategory').innerText = btn.getAttribute('data-category');
+            document.getElementById('mDivision').innerText = btn.getAttribute('data-division');
+            document.getElementById('mLeader').innerText = btn.getAttribute('data-leader');
+            document.getElementById('mTeam').innerText = btn.getAttribute('data-team');
+            document.getElementById('mStart').innerText = btn.getAttribute('data-start');
+            document.getElementById('mEnd').innerText = btn.getAttribute('data-end');
+            document.getElementById('mStatusBadge').innerText = btn.getAttribute('data-status');
+            document.getElementById('projectModal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('projectModal').style.display = 'none'; }
+        window.onclick = function(event) { if (event.target == document.getElementById('projectModal')) { closeModal(); } }
+        
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const divisionFilter = document.getElementById('divisionFilter').value;
+            const rows = document.querySelectorAll('#projectTable tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const leader = row.getAttribute('data-leader');
+                const status = row.getAttribute('data-status');
+                const division = row.getAttribute('data-division');
                 
-                // Atur Badge Status
-                var status = btn.getAttribute('data-status');
-                var badge = document.getElementById('mStatusBadge');
-                badge.innerText = status;
+                const matchSearch = name.includes(searchText) || leader.includes(searchText);
+                const matchStatus = !statusFilter || status === statusFilter;
+                const matchDivision = !divisionFilter || division === divisionFilter;
                 
-                if(status === 'Completed') {
-                    badge.className = 'badge badge-success';
+                if (matchSearch && matchStatus && matchDivision) {
+                    row.style.display = '';
+                    visibleCount++;
                 } else {
-                    badge.className = 'badge badge-danger';
+                    row.style.display = 'none';
                 }
-
-                // Tampilkan Modal
-                document.getElementById('projectModal').style.display = 'flex';
-            }
-
-            function closeModal() {
-                document.getElementById('projectModal').style.display = 'none';
-            }
-
-            // Tutup jika klik di luar area kartu
-            window.onclick = function(event) {
-                var modal = document.getElementById('projectModal');
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            }
-        </script>
-
-    </body>
+            });
+            
+            document.getElementById('resultInfo').textContent = visibleCount + ' proyek ditemukan';
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+            document.getElementById('projectTable').style.display = visibleCount === 0 ? 'none' : '';
+        }
+    </script>
+</body>
 </html>

@@ -1,82 +1,52 @@
-<%-- 
-    Document   : create-archive
-    Created on : 26 Dec 2025, 22.01.12
-    Author     : Rudi Firdaus
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="com.lablink.model.Project"%>
+﻿<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="com.lablink.model.Project"%>
 <%
     Project p = (Project) request.getAttribute("sourceProject");
     if (p == null) { response.sendRedirect("project"); return; }
-    
-    // Tentukan Tipe Otomatis berdasarkan tipe proyek
     String archiveType = "Riset".equals(p.getActivityType()) ? "Publikasi" : "HKI";
 %>
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Buat Arsip - LabLink</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-light">
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            Formulir Arsip Output (Project Completion)
-                        </div>
-                        <div class="card-body">
-                            <form action="archive" method="post">
-                                <input type="hidden" name="action" value="saveArchive">
-                                <input type="hidden" name="projectID" value="<%= p.getProjectID() %>">
-                                
-                                <div class="alert alert-info">
-                                    <strong>Sumber Proyek:</strong> <%= p.getProjectName() %> (<%= p.getProjectID() %>)
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">ID Arsip</label>
-                                    <input type="text" name="id" class="form-control" placeholder="ARC-..." required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Judul Publikasi / HKI</label>
-                                    <input type="text" name="title" class="form-control" value="<%= p.getProjectName() %>" required>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Tipe Output</label>
-                                        <input type="text" name="type" class="form-control" value="<%= archiveType %>" readonly>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Tanggal Terbit/Grant</label>
-                                        <input type="date" name="date" class="form-control" required>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Nama Jurnal / Badan HKI</label>
-                                        <input type="text" name="location" class="form-control" placeholder="Contoh: IEEE Access / DJKI" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">No. Referensi (DOI / No. Reg)</label>
-                                        <input type="text" name="refNum" class="form-control" placeholder="Contoh: 10.1109/... atau IDM000..." required>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-3">
-                                    <a href="project" class="btn btn-secondary">Batal</a>
-                                    <button type="submit" class="btn btn-primary">Simpan ke Arsip</button>
-                                </div>
-                            </form>
-                        </div>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Arsip - LabLink</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="app-body">
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-section"><h1 class="page-title"><i class="fas fa-file-archive"></i> Arsipkan Proyek</h1><p class="page-subtitle">Simpan output hasil riset ke arsip</p></div>
+                <div class="top-bar-right"><a href="project" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Kembali</a></div>
+            </header>
+            <div class="content-card" style="max-width: 700px;">
+                <div class="card-body">
+                    <div style="padding: 16px 20px; background: linear-gradient(135deg, var(--blue-light), #dbeafe); border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; background: var(--blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;"><i class="fas fa-project-diagram"></i></div>
+                        <div><p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;">Sumber Proyek</p><h3 style="margin: 4px 0 0 0; color: var(--secondary);"><%= p.getProjectName() %></h3><span class="badge badge-info" style="margin-top: 6px;"><%= p.getProjectID() %></span></div>
                     </div>
+                    <form action="archive" method="post">
+                        <input type="hidden" name="action" value="saveArchive">
+                        <input type="hidden" name="projectID" value="<%= p.getProjectID() %>">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group"><label class="form-label">ID Arsip <span style="color: var(--danger);">*</span></label><input type="text" name="id" class="form-control" placeholder="ARC-001" required></div>
+                            <div class="form-group"><label class="form-label">Tipe Output</label><input type="text" name="type" class="form-control" value="<%= archiveType %>" readonly style="background: #f1f5f9;"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Judul Publikasi / HKI <span style="color: var(--danger);">*</span></label><input type="text" name="title" class="form-control" value="<%= p.getProjectName() %>" required></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group"><label class="form-label">Nama Jurnal / Badan HKI <span style="color: var(--danger);">*</span></label><input type="text" name="location" class="form-control" placeholder="Contoh: IEEE Access / DJKI" required></div>
+                            <div class="form-group"><label class="form-label">Tanggal Terbit/Grant <span style="color: var(--danger);">*</span></label><input type="date" name="date" class="form-control" required></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">No. Referensi (DOI / No. Reg) <span style="color: var(--danger);">*</span></label><input type="text" name="refNum" class="form-control" placeholder="Contoh: 10.1109/... atau IDM000..." required></div>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);"><a href="project" class="btn btn-outline">Batal</a><button type="submit" class="btn btn-primary"><i class="fas fa-archive"></i> Simpan ke Arsip</button></div>
+                    </form>
                 </div>
             </div>
-        </div>
-    </body>
+        </main>
+    </div>
+</body>
 </html>

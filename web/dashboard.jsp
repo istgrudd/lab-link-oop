@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : dashboard
     Created on : 25 Dec 2025, 22.39.28
     Author     : Rudi Firdaus
@@ -14,157 +14,114 @@
 <%@page import="java.util.Locale"%>
 
 <%
-    // Cek Session
     LabMember user = (LabMember) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
-    
-    // Ambil Data dari Controller
     Map<String, Integer> stats = (Map<String, Integer>) request.getAttribute("stats");
     List<AgendaItem> agendaList = (List<AgendaItem>) request.getAttribute("agendaList");
+    LocalDate today = LocalDate.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
+    String dateString = today.format(formatter);
 %>
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Dashboard - LabLink</title>
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body>
-
-        <div class="dashboard-container">
-            <jsp:include page="sidebar.jsp" /> 
-
-            <main class="main-content">
-                
-                <header class="top-bar">
-                    <div class="welcome-text">
-                        <h1>Dashboard Overview</h1>
-                        <p class="text-muted small">Ringkasan aktivitas hari ini</p>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LabLink</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="app-body">
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-section">
+                    <h1 class="page-title"><i class="fas fa-th-large"></i> Dashboard</h1>
+                    <p class="page-subtitle">Selamat datang kembali, <strong><%= user.getName() %></strong></p>
+                </div>
+                <div class="top-bar-right">
+                    <div class="date-badge"><i class="far fa-calendar-alt"></i> <span><%= dateString %></span></div>
+                </div>
+            </header>
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-spinner fa-pulse"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value"><%= stats != null ? stats.getOrDefault("projectOngoing", 0) : 0 %></h3>
+                        <p class="stat-label">Proyek Berjalan</p>
                     </div>
-                    
-                    <div class="date-display">
-                        <i class="far fa-calendar-alt me-2"></i>
-                        <% 
-                            LocalDate today = LocalDate.now();
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
-                            String dateString = today.format(formatter);
-                        %>
-                        <%= dateString %>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value"><%= stats != null ? stats.getOrDefault("projectCompleted", 0) : 0 %></h3>
+                        <p class="stat-label">Proyek Selesai</p>
                     </div>
-                </header>
-
-                <section class="stats-grid">
-                    <div class="stat-card blue">
-                        <div class="icon"><i class="fas fa-spinner"></i></div>
-                        <div class="info">
-                            <h3><%= stats.getOrDefault("projectOngoing", 0) %></h3>
-                            <p>Proyek Berjalan</p>
-                        </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-bullhorn"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value"><%= stats != null ? stats.getOrDefault("totalEvent", 0) : 0 %></h3>
+                        <p class="stat-label">Total Event</p>
                     </div>
-                    
-                    <div class="stat-card green">
-                        <div class="icon"><i class="fas fa-check-circle"></i></div>
-                        <div class="info">
-                            <h3><%= stats.getOrDefault("projectCompleted", 0) %></h3>
-                            <p>Proyek Selesai</p>
-                        </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-book"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value"><%= stats != null ? stats.getOrDefault("totalPublikasi", 0) : 0 %></h3>
+                        <p class="stat-label">Publikasi</p>
                     </div>
-
-                    <div class="stat-card orange">
-                        <div class="icon"><i class="fas fa-bullhorn"></i></div>
-                        <div class="info">
-                            <h3><%= stats.getOrDefault("totalEvent", 0) %></h3>
-                            <p>Total Event</p>
-                        </div>
-                    </div>
-
-                    <div class="stat-card purple">
-                        <div class="icon"><i class="fas fa-book"></i></div>
-                        <div class="info">
-                            <h3><%= stats.getOrDefault("totalPublikasi", 0) %></h3>
-                            <p>Total Publikasi</p>
-                        </div>
-                    </div>
-                </section>
-
-                <div class="content-split">
-                    <section class="agenda-section">
+                </div>
+            </section>
+            <div class="content-grid">
+                <section class="content-card agenda-card">
+                    <div class="card-header">
                         <h2><i class="fas fa-clock"></i> Agenda Mendatang</h2>
+                        <a href="event" class="btn-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body">
                         <div class="agenda-list">
                             <% if (agendaList != null && !agendaList.isEmpty()) { 
                                 for (AgendaItem item : agendaList) { 
                                     LocalDate date = LocalDate.parse(item.getDate());
                             %>
-                                <div class="agenda-card">
-                                    <div class="date-box">
+                                <div class="agenda-item">
+                                    <div class="agenda-date">
                                         <span class="day"><%= date.getDayOfMonth() %></span>
-                                        <span class="month"><%= date.getMonth() %></span>
+                                        <span class="month"><%= date.getMonth().toString().substring(0, 3) %></span>
                                     </div>
-                                    <div class="agenda-details">
+                                    <div class="agenda-content">
                                         <h4><%= item.getTitle() %></h4>
-                                        
-                                        <span class="badge <%= "Proyek".equals(item.getCategory()) ? "badge-danger" : "badge-success" %>">
-                                            <%= item.getCategory() %>
-                                        </span>
-                                        
-                                        <p><%= item.getInfo() %></p>
+                                        <div class="agenda-meta">
+                                            <span class="badge <%= "Proyek".equals(item.getCategory()) ? "badge-danger" : "badge-success" %>"><%= item.getCategory() %></span>
+                                            <span class="agenda-info"><%= item.getInfo() %></span>
+                                        </div>
                                     </div>
                                 </div>
-                            <%  } 
-                               } else { %>
-                                <p class="empty-state">Tidak ada agenda mendesak.</p>
+                            <% } } else { %>
+                                <div class="empty-state"><i class="fas fa-calendar-check"></i><p>Tidak ada agenda mendatang</p></div>
                             <% } %>
                         </div>
-                    </section>
-
-                    <section class="tasks-section">
-                        <h2><i class="fas fa-tasks"></i> Tugas Saya</h2>
-                        <div class="task-placeholder">
-                            <p>Fitur "My Tasks" akan menampilkan proyek di mana Anda terlibat.</p>
-                            <a href="project" class="btn-small">Lihat Semua Proyek</a>
+                    </div>
+                </section>
+                <section class="content-card tasks-card">
+                    <div class="card-header"><h2><i class="fas fa-bolt"></i> Aksi Cepat</h2></div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <a href="project" class="quick-action-item"><div class="qa-icon blue"><i class="fas fa-folder-plus"></i></div><span>Lihat Proyek</span></a>
+                            <a href="event" class="quick-action-item"><div class="qa-icon orange"><i class="fas fa-calendar-plus"></i></div><span>Lihat Event</span></a>
+                            <a href="member" class="quick-action-item"><div class="qa-icon green"><i class="fas fa-user-plus"></i></div><span>Anggota Lab</span></a>
+                            <a href="report" class="quick-action-item"><div class="qa-icon purple"><i class="fas fa-file-alt"></i></div><span>Laporan</span></a>
                         </div>
-                    </section>
-                </div>
-
-            </main>
-        </div>
-        <nav class="bottom-nav">
-            <a href="dashboard" class="bottom-nav-item active">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="project" class="bottom-nav-item">
-                <i class="fas fa-project-diagram"></i>
-                <span>Proyek</span>
-            </a>
-            <a href="event" class="bottom-nav-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Event</span>
-            </a>
-            <a href="#" class="bottom-nav-item" onclick="alert('Fitur Administrasi akan segera hadir!')">
-                <i class="fas fa-file-alt"></i>
-                <span>Admin</span>
-            </a>
-            <a href="profile.jsp" class="bottom-nav-item">
-                <i class="fas fa-user"></i>
-                <span>Akun</span>
-            </a>
-        </nav>
-
-        <script>
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.bottom-nav-item, .sidebar-menu a');
-            
-            navLinks.forEach(link => {
-                if(link.getAttribute('href') !== '#' && currentPath.includes(link.getAttribute('href'))) {
-                    link.classList.add('active'); // Tambahkan class active jika URL cocok
-                }
-            });
-        </script>
-
-    </body>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
 </html>
