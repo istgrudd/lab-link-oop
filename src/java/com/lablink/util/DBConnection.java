@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class DBConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/lablink_eksperimen";
     private static final String USER = "root"; // Sesuaikan user mysql
-    private static final String PASS = "Swe3thome14.";     // Sesuaikan password mysql
+    private static final String PASS = "";     // Sesuaikan password mysql
 
     public static Connection getConnection() {
         Connection conn = null;
