@@ -7,6 +7,7 @@ import com.lablink.model.LabMember;
 import com.lablink.model.Project;
 import java.io.IOException;
 import java.util.List;
+import com.lablink.util.IDGenerator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -61,13 +62,15 @@ public class ArchiveController extends HttpServlet {
         
         // Fitur Simpan Arsip
         if ("saveArchive".equals(action)) {
-            String id = request.getParameter("id");
             String projectID = request.getParameter("projectID");
             String title = request.getParameter("title");
             String type = request.getParameter("type");
-            String location = request.getParameter("location"); // Jurnal/Badan HKI
-            String refNum = request.getParameter("refNum");     // DOI/No Reg
+            String location = request.getParameter("location");
+            String refNum = request.getParameter("refNum");
             String date = request.getParameter("date");
+            
+            // Generate Archive ID based on type
+            String id = IDGenerator.generateArchiveID(type);
             
             Archive a = new Archive(id, projectID, "", title, type, location, refNum, date, "");
             archiveDAO.addArchive(a);

@@ -31,21 +31,54 @@
                     <% } %>
                 </div>
             </header>
+            
+            <!-- Search & Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama atau NIM..." onkeyup="filterTable()">
+                </div>
+                <select class="filter-dropdown" id="divisionFilter" onchange="filterTable()">
+                    <option value="">Semua Divisi</option>
+                    <option value="Big Data">Big Data</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="GIS">GIS</option>
+                    <option value="Game Tech">Game Tech</option>
+                </select>
+                <select class="filter-dropdown" id="deptFilter" onchange="filterTable()">
+                    <option value="">Semua Departemen</option>
+                    <option value="Internal">Internal</option>
+                    <option value="Eksternal">Eksternal</option>
+                </select>
+                <span class="search-result-info" id="resultInfo"></span>
+            </div>
+            
             <div class="content-card">
                 <div class="card-body" style="padding: 0;">
-                    <table class="data-table">
+                    <table class="data-table" id="memberTable">
                         <thead>
-                            <tr><th>ID</th><th>Nama</th><th>Divisi</th><th>Departemen</th><th>Jabatan</th><th>Beban Kerja</th><% if (isAdmin) { %><th>Aksi</th><% } %></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Divisi</th>
+                                <th>Departemen</th>
+                                <th>Jabatan</th>
+                                <th>Beban Kerja</th>
+                                <% if (isAdmin) { %><th>Aksi</th><% } %>
+                            </tr>
                         </thead>
                         <tbody>
                             <% List<ResearchAssistant> list = (List<ResearchAssistant>) request.getAttribute("listRA");
                                if (list != null && !list.isEmpty()) { for (ResearchAssistant ra : list) { %>
-                            <tr>
+                            <tr data-name="<%= ra.getName().toLowerCase() %>" data-id="<%= ra.getMemberID().toLowerCase() %>" data-division="<%= ra.getExpertDivision() %>" data-dept="<%= ra.getDepartment() %>">
                                 <td style="font-weight: 600; color: var(--text-muted);"><%= ra.getMemberID() %></td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--teal)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;"><%= ra.getName().substring(0, 1).toUpperCase() %></div>
-                                        <div><div style="font-weight: 600; color: var(--secondary);"><%= ra.getName() %></div><div style="font-size: 0.75rem; color: var(--text-muted);"><%= ra.getAccessRole() %></div></div>
+                                        <div>
+                                            <div style="font-weight: 600; color: var(--secondary);"><%= ra.getName() %></div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);"><%= ra.getAccessRole() %></div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td><span class="badge badge-primary"><%= ra.getExpertDivision() %></span></td>
@@ -53,7 +86,9 @@
                                 <td><%= (ra.getRoleTitle() != null && !ra.getRoleTitle().isEmpty()) ? ra.getRoleTitle() : "-" %></td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden;"><div style="width: <%= Math.min(ra.calculateWorkload() * 10, 100) %>%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--teal));"></div></div>
+                                        <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                                            <div style="width: <%= Math.min(ra.calculateWorkload() * 10, 100) %>%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--teal));"></div>
+                                        </div>
                                         <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);"><%= ra.calculateWorkload() %> Jam</span>
                                     </div>
                                 </td>
@@ -71,9 +106,44 @@
                             <% } %>
                         </tbody>
                     </table>
+                    <div id="noResults" class="no-results" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada anggota yang cocok dengan pencarian</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
+    <script>
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const divisionFilter = document.getElementById('divisionFilter').value;
+            const deptFilter = document.getElementById('deptFilter').value;
+            const rows = document.querySelectorAll('#memberTable tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                if (!row.hasAttribute('data-name')) return;
+                const name = row.getAttribute('data-name');
+                const id = row.getAttribute('data-id');
+                const division = row.getAttribute('data-division');
+                const dept = row.getAttribute('data-dept');
+                
+                const matchSearch = name.includes(searchText) || id.includes(searchText);
+                const matchDivision = !divisionFilter || division === divisionFilter;
+                const matchDept = !deptFilter || dept === deptFilter;
+                
+                if (matchSearch && matchDivision && matchDept) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('resultInfo').textContent = visibleCount + ' anggota ditemukan';
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>

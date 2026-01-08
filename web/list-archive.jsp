@@ -31,7 +31,21 @@
                         <tbody>
                             <% if (listA != null && !listA.isEmpty()) { for (Archive a : listA) { %>
                             <tr>
-                                <td><% if("Publikasi".equals(a.getType())) { %><span class="badge badge-info"><i class="fas fa-book"></i> Publikasi</span><% } else { %><span class="badge badge-success"><i class="fas fa-certificate"></i> HKI</span><% } %></td>
+                                <td>
+                                    <% 
+                                    String type = a.getType();
+                                    String badgeClass = "badge-info";
+                                    String icon = "fa-book";
+                                    if ("HKI".equals(type)) {
+                                        badgeClass = "badge-success";
+                                        icon = "fa-certificate";
+                                    } else if ("Pengabdian".equals(type)) {
+                                        badgeClass = "badge-primary"; 
+                                        icon = "fa-hands-helping";
+                                    }
+                                    %>
+                                    <span class="badge <%= badgeClass %>"><i class="fas <%= icon %>"></i> <%= type %></span>
+                                </td>
                                 <td style="font-weight: 600; color: var(--secondary); max-width: 250px;"><%= a.getTitle() %></td>
                                 <td><%= a.getPublishLocation() %></td>
                                 <td style="color: var(--text-muted); font-size: 0.85rem;"><%= a.getReferenceNumber() %></td>

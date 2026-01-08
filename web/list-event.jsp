@@ -33,18 +33,42 @@
                     <% } %>
                 </div>
             </header>
+            
+            <!-- Search & Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama kegiatan atau PIC..." onkeyup="filterTable()">
+                </div>
+                <span class="search-result-info" id="resultInfo"></span>
+            </div>
+            
             <div class="content-card">
                 <div class="card-body" style="padding: 0;">
-                    <table class="data-table">
-                        <thead><tr><th>Tanggal</th><th>Nama Kegiatan</th><th>PIC</th><th>Panitia</th><th>Aksi</th></tr></thead>
+                    <table class="data-table" id="eventTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama Kegiatan</th>
+                                <th>PIC</th>
+                                <th>Panitia</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <% List<LabEvent> listE = (List<LabEvent>) request.getAttribute("listEvent");
                                if (listE != null && !listE.isEmpty()) { for (LabEvent e : listE) { %>
-                            <tr>
+                            <tr data-name="<%= e.getEventName().toLowerCase() %>" data-pic="<%= e.getPicName() != null ? e.getPicName().toLowerCase() : "" %>">
                                 <td><span class="badge badge-success"><i class="far fa-calendar"></i> <%= e.getEventDate() %></span></td>
                                 <td style="font-weight: 600; color: var(--secondary);"><%= e.getEventName() %></td>
                                 <td><%= (e.getPicName() != null) ? e.getPicName() : "-" %></td>
-                                <td><div style="display: flex; flex-wrap: wrap; gap: 4px;"><% for(String com : e.getCommitteeNames()) { %><span class="badge badge-info" style="font-size: 0.7rem;"><%= com %></span><% } %></div></td>
+                                <td>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                        <% for(String com : e.getCommitteeNames()) { %>
+                                        <span class="badge badge-info" style="font-size: 0.7rem;"><%= com %></span>
+                                        <% } %>
+                                    </div>
+                                </td>
                                 <td>
                                     <div style="display: flex; gap: 8px;">
                                         <button onclick="showEventDetail(this)" class="btn btn-outline btn-sm btn-icon" data-title="<%= e.getEventName() %>" data-date="<%= e.getEventDate() %>" data-pic="<%= e.getPicName() != null ? e.getPicName() : "-" %>" data-desc="<%= (e.getDescription() != null && !e.getDescription().isEmpty()) ? e.getDescription() : "Tidak ada deskripsi." %>" data-committee="<%= String.join(", ", e.getCommitteeNames()) %>" title="Detail"><i class="fas fa-eye"></i></button>
@@ -60,13 +84,20 @@
                             <% } %>
                         </tbody>
                     </table>
+                    <div id="noResults" class="no-results" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada kegiatan yang cocok dengan pencarian</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     <div id="eventModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-header"><h3><i class="fas fa-calendar-alt"></i> Detail Kegiatan</h3><button class="close-btn" onclick="closeEventModal()">&times;</button></div>
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-alt"></i> Detail Kegiatan</h3>
+                <button class="close-btn" onclick="closeEventModal()">&times;</button>
+            </div>
             <div class="modal-body">
                 <div class="detail-row"><span class="detail-label">Nama Kegiatan</span><span class="detail-value" id="evTitle"></span></div>
                 <div class="detail-row"><span class="detail-label">Deskripsi</span><span class="detail-value" id="evDesc"></span></div>
@@ -87,6 +118,30 @@
         }
         function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
         window.onclick = function(event) { if (event.target == document.getElementById('eventModal')) { closeEventModal(); } }
+        
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#eventTable tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                if (!row.hasAttribute('data-name')) return;
+                const name = row.getAttribute('data-name');
+                const pic = row.getAttribute('data-pic');
+                
+                const matchSearch = name.includes(searchText) || pic.includes(searchText);
+                
+                if (matchSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('resultInfo').textContent = visibleCount + ' kegiatan ditemukan';
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
     </script>
 </body>
 </html>

@@ -2,12 +2,14 @@ package com.lablink.controller;
 
 import com.lablink.dao.EventDAO;
 import com.lablink.dao.MemberDAO;
+import com.lablink.dao.ActivityLogDAO;
 import com.lablink.model.LabEvent;
 import com.lablink.model.LabMember;
 import com.lablink.model.ResearchAssistant;
 import com.lablink.model.CommitteeMember;
 import java.io.IOException;
 import java.util.List;
+import com.lablink.util.IDGenerator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,11 +21,13 @@ import javax.servlet.http.HttpSession;
 public class EventController extends HttpServlet {
     private EventDAO eventDAO;
     private MemberDAO memberDAO;
+    private ActivityLogDAO logDAO;
 
     @Override
     public void init() {
         eventDAO = new EventDAO();
         memberDAO = new MemberDAO();
+        logDAO = new ActivityLogDAO();
     }
 
     @Override
@@ -71,7 +75,11 @@ public class EventController extends HttpServlet {
 
             if (canManage) {
                 String id = request.getParameter("id");
+                LabEvent delEvent = eventDAO.getEventById(id);
+                String delName = (delEvent != null) ? delEvent.getEventName() : id;
                 eventDAO.deleteEvent(id);
+                logDAO.log(user.getMemberID(), user.getName(), "DELETE", "EVENT", id, delName,
+                        "Menghapus kegiatan: " + delName);
             }
             response.sendRedirect("event");
             return;
@@ -107,14 +115,18 @@ public class EventController extends HttpServlet {
 
         // Fitur Tambah Event
         if ("addEvent".equals(action)) {
-            String id = request.getParameter("id");
             String name = request.getParameter("name");
             String description = request.getParameter("description");
-            String date = request.getParameter("date"); // Format dari input type="date"
+            String date = request.getParameter("date");
             String picID = request.getParameter("picID");
+            
+            // Generate Event ID automatically
+            String id = IDGenerator.generateEventID();
 
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.addEvent(e);
+            logDAO.log(user.getMemberID(), user.getName(), "CREATE", "EVENT", id, name,
+                    "Menambah kegiatan baru: " + name);
 
             // Fitur Update Event
         } else if ("updateEvent".equals(action)) {
@@ -126,11 +138,16 @@ public class EventController extends HttpServlet {
 
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.updateEvent(e);
+            logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "EVENT", id, name, "Mengupdate kegiatan: " + name);
 
             // Fitur Hapus Event
         } else if ("deleteEvent".equals(action)) {
             String id = request.getParameter("id");
+            LabEvent delE = eventDAO.getEventById(id);
+            String delName = (delE != null) ? delE.getEventName() : id;
             eventDAO.deleteEvent(id);
+            logDAO.log(user.getMemberID(), user.getName(), "DELETE", "EVENT", id, delName,
+                    "Menghapus kegiatan: " + delName);
             // Fitur Tambah Panitia
         } else if ("addCommittee".equals(action)) {
             String eventID = request.getParameter("eventID");

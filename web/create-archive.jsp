@@ -3,7 +3,17 @@
 <%
     Project p = (Project) request.getAttribute("sourceProject");
     if (p == null) { response.sendRedirect("project"); return; }
-    String archiveType = "Riset".equals(p.getActivityType()) ? "Publikasi" : "HKI";
+    
+    // Map project category to archive type
+    String activityType = p.getActivityType();
+    String archiveType;
+    if ("Riset".equals(activityType)) {
+        archiveType = "Publikasi";
+    } else if ("HKI".equals(activityType)) {
+        archiveType = "HKI";
+    } else {
+        archiveType = "Pengabdian"; // Pengabdian Masyarakat
+    }
 %>
 <!DOCTYPE html>
 <html lang="id">
@@ -33,15 +43,14 @@
                         <input type="hidden" name="action" value="saveArchive">
                         <input type="hidden" name="projectID" value="<%= p.getProjectID() %>">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div class="form-group"><label class="form-label">ID Arsip <span style="color: var(--danger);">*</span></label><input type="text" name="id" class="form-control" placeholder="ARC-001" required></div>
                             <div class="form-group"><label class="form-label">Tipe Output</label><input type="text" name="type" class="form-control" value="<%= archiveType %>" readonly style="background: #f1f5f9;"></div>
+                            <div class="form-group"><label class="form-label">Tanggal Terbit/Grant <span style="color: var(--danger);">*</span></label><input type="date" name="date" class="form-control" required></div>
                         </div>
                         <div class="form-group"><label class="form-label">Judul Publikasi / HKI <span style="color: var(--danger);">*</span></label><input type="text" name="title" class="form-control" value="<%= p.getProjectName() %>" required></div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                             <div class="form-group"><label class="form-label">Nama Jurnal / Badan HKI <span style="color: var(--danger);">*</span></label><input type="text" name="location" class="form-control" placeholder="Contoh: IEEE Access / DJKI" required></div>
-                            <div class="form-group"><label class="form-label">Tanggal Terbit/Grant <span style="color: var(--danger);">*</span></label><input type="date" name="date" class="form-control" required></div>
+                            <div class="form-group"><label class="form-label">No. Referensi (DOI / No. Reg) <span style="color: var(--danger);">*</span></label><input type="text" name="refNum" class="form-control" placeholder="Contoh: 10.1109/... atau IDM000..." required></div>
                         </div>
-                        <div class="form-group"><label class="form-label">No. Referensi (DOI / No. Reg) <span style="color: var(--danger);">*</span></label><input type="text" name="refNum" class="form-control" placeholder="Contoh: 10.1109/... atau IDM000..." required></div>
                         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);"><a href="project" class="btn btn-outline">Batal</a><button type="submit" class="btn btn-primary"><i class="fas fa-archive"></i> Simpan ke Arsip</button></div>
                     </form>
                 </div>

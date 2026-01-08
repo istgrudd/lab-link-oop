@@ -1,6 +1,7 @@
 package com.lablink.controller;
 
 import com.lablink.dao.MemberDAO;
+import com.lablink.dao.ActivityLogDAO;
 import com.lablink.model.ResearchAssistant;
 import java.io.IOException;
 import java.util.List;
@@ -17,10 +18,11 @@ import javax.servlet.http.HttpSession;
 public class MemberController extends HttpServlet {
     // Member DAO
     private MemberDAO memberDAO;
+    private ActivityLogDAO logDAO;
 
-    @Override
     public void init() {
         memberDAO = new MemberDAO();
+        logDAO = new ActivityLogDAO();
     }
 
     @Override
@@ -43,8 +45,16 @@ public class MemberController extends HttpServlet {
 
             // Fitur Hapus Member
         } else if ("delete".equals(action)) {
+            HttpSession session = request.getSession(false);
+            LabMember user = (LabMember) session.getAttribute("user");
             String id = request.getParameter("id");
+            ResearchAssistant delMember = memberDAO.getMemberById(id);
+            String delName = (delMember != null) ? delMember.getName() : id;
             memberDAO.deleteMember(id);
+            if (user != null) {
+                logDAO.log(user.getMemberID(), user.getName(), "DELETE", "MEMBER", id, delName,
+                        "Menghapus anggota: " + delName);
+            }
             response.sendRedirect("member");
 
             // Fitur Tampilkan List Member
@@ -80,6 +90,8 @@ public class MemberController extends HttpServlet {
                     id, name, division, dept, roleTitle, "", "", accessRole);
 
             memberDAO.updateMember(ra);
+            logDAO.log(currentUser.getMemberID(), currentUser.getName(), "UPDATE", "MEMBER", id, name,
+                    "Mengupdate anggota: " + name);
             response.sendRedirect("member");
 
             // Fitur Tambah Member
@@ -100,6 +112,8 @@ public class MemberController extends HttpServlet {
             ResearchAssistant newRA = new ResearchAssistant(id, name, division, department, role, id, id, accessRole);
 
             memberDAO.addMember(newRA);
+            logDAO.log(currentUser.getMemberID(), currentUser.getName(), "CREATE", "MEMBER", id, name,
+                    "Menambah anggota baru: " + name);
             response.sendRedirect("member");
         }
 

@@ -35,12 +35,7 @@
                     <div class="card-body">
                         <form action="event" method="post">
                             <input type="hidden" name="action" value="<%= isEdit ? "updateEvent" : "addEvent" %>">
-                            <% if (!isEdit) { %>
-                            <div class="form-group">
-                                <label class="form-label">Kode Event <span style="color: var(--danger);">*</span></label>
-                                <input type="text" name="id" class="form-control" placeholder="EVT-001" required>
-                            </div>
-                            <% } else { %>
+                            <% if (isEdit) { %>
                             <input type="hidden" name="id" value="<%= e.getEventID() %>">
                             <% } %>
                             <div class="form-group">

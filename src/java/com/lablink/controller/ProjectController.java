@@ -2,13 +2,13 @@ package com.lablink.controller;
 
 import com.lablink.dao.ProjectDAO;
 import com.lablink.dao.MemberDAO;
+import com.lablink.dao.ActivityLogDAO;
 import com.lablink.model.Project;
 import com.lablink.model.ResearchAssistant;
 import com.lablink.model.LabMember;
 import java.io.IOException;
 import java.util.List;
-import java.util.Arrays;
-import java.util.UUID;
+import com.lablink.util.IDGenerator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,22 +16,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet(name = "ProjectController", urlPatterns = {"/project"})
+@WebServlet(name = "ProjectController", urlPatterns = { "/project" })
 public class ProjectController extends HttpServlet {
 
     private ProjectDAO projectDAO;
     private MemberDAO memberDAO;
+    private ActivityLogDAO logDAO;
 
     @Override
     public void init() {
         projectDAO = new ProjectDAO();
         memberDAO = new MemberDAO();
+        logDAO = new ActivityLogDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Feature: Check Session
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -39,8 +41,9 @@ public class ProjectController extends HttpServlet {
             return;
         }
 
+        LabMember user = (LabMember) session.getAttribute("user");
         String action = request.getParameter("action");
-        
+
         // Important: Prevent NullPointerException
         if (action == null) {
             action = "list";
@@ -62,11 +65,15 @@ public class ProjectController extends HttpServlet {
                 request.setAttribute("listMember", memberDAO.getAllMembers());
                 request.getRequestDispatcher("edit-project.jsp").forward(request, response);
                 break;
-            
+
             // Feature: Delete Project
             case "delete":
                 String deleteId = request.getParameter("id");
+                Project delProject = projectDAO.getProjectById(deleteId);
+                String delName = (delProject != null) ? delProject.getProjectName() : deleteId;
                 projectDAO.deleteProject(deleteId);
+                logDAO.log(user.getMemberID(), user.getName(), "DELETE", "PROJECT", deleteId, delName,
+                        "Menghapus proyek: " + delName);
                 response.sendRedirect("project");
                 break;
 
@@ -82,10 +89,10 @@ public class ProjectController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
         LabMember user = (LabMember) session.getAttribute("user");
-        
+
         // Feature: Check Role (Only Internal & Lab Head allowed)
         if (user == null || "HEAD_OF_EXTERNAL".equals(user.getAccessRole())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak.");
@@ -93,7 +100,7 @@ public class ProjectController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        
+
         // Feature: Save (Add) & Update (Edit)
         if ("save".equals(action) || "update".equals(action)) {
             String id = request.getParameter("projectID");
@@ -107,28 +114,35 @@ public class ProjectController extends HttpServlet {
             String endDate = request.getParameter("endDate");
 
             String[] teamMemberIDs = request.getParameterValues("teamMembers");
-            
-            // Generate ID if new
+
+            // Generate ID if new (based on category)
             if (id == null || id.isEmpty()) {
-                id = UUID.randomUUID().toString().substring(0, 8);
+                id = IDGenerator.generateProjectID(category);
             }
 
             // Create Project object
-            Project p = new Project(id, name, description, status, category, division, leaderID, "", startDate, endDate);
+            Project p = new Project(id, name, description, status, category, division, leaderID, "", startDate,
+                    endDate);
 
             if ("update".equals(action)) {
-                // Send teamMemberIDs array to DAO
                 projectDAO.updateProject(p, teamMemberIDs);
+                logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "PROJECT", id, name,
+                        "Mengupdate proyek: " + name);
             } else {
-                // Send teamMemberIDs array to DAO
                 projectDAO.addProject(p, teamMemberIDs);
+                logDAO.log(user.getMemberID(), user.getName(), "CREATE", "PROJECT", id, name,
+                        "Membuat proyek baru: " + name);
             }
-        // Feature: Delete Project
+            // Feature: Delete Project
         } else if ("delete".equals(action)) {
             String id = request.getParameter("id");
+            Project dp = projectDAO.getProjectById(id);
+            String dpName = (dp != null) ? dp.getProjectName() : id;
             projectDAO.deleteProject(id);
+            logDAO.log(user.getMemberID(), user.getName(), "DELETE", "PROJECT", id, dpName,
+                    "Menghapus proyek: " + dpName);
         }
-        
+
         // Redirect back to list
         response.sendRedirect("project");
     }
