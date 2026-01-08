@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.controller;
 
 import com.lablink.dao.MemberDAO;
@@ -16,11 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Rudi Firdaus
- */
-
 @WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
 public class ProfileController extends HttpServlet {
     private MemberDAO memberDAO;
@@ -33,13 +24,13 @@ public class ProfileController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Cek Login
+        // Fitur Cek Login
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
-        // Tampilkan halaman profil
+        // Fitur Tampilkan Halaman Profil
         request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
 
@@ -50,7 +41,7 @@ public class ProfileController extends HttpServlet {
         HttpSession session = request.getSession(false);
         LabMember currentUser = (LabMember) session.getAttribute("user");
         
-        // Ambil parameter 'action' untuk membedakan form mana yang disubmit
+        // Get the 'action' parameter to differentiate which form was submitted
         String action = request.getParameter("action");
 
         if ("updateInfo".equals(action)) {
@@ -59,7 +50,7 @@ public class ProfileController extends HttpServlet {
             handleChangePassword(request, currentUser);
         }
         
-        // Kembali ke halaman profil
+        // Return to the profile page
         request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
 
@@ -68,37 +59,33 @@ public class ProfileController extends HttpServlet {
         String division = request.getParameter("division");
         String department = request.getParameter("department");
         
-        // --- LOGIKA BARU MULAI SINI ---
-        
         String roleToSave = "";
         
-        // 1. Ambil jabatan lama sebagai default
+        // Get the old position as a default
         if (currentUser instanceof ResearchAssistant) {
             roleToSave = ((ResearchAssistant) currentUser).getRoleTitle();
         }
         
-        // 2. Jika user adalah ADMIN, kita izinkan menimpa jabatan lama dengan input baru
+        // If the user is an ADMIN, we allow overwriting the old position with new input
         if ("HEAD_OF_LAB".equals(currentUser.getAccessRole())) {
-            String inputRole = request.getParameter("role"); // Ambil dari form name="role"
+            String inputRole = request.getParameter("role"); // Get from form name="role"
             if (inputRole != null && !inputRole.trim().isEmpty()) {
                 roleToSave = inputRole;
             }
         }
-        
-        // --- LOGIKA BARU SELESAI ---
 
         ResearchAssistant updatedRA = new ResearchAssistant(
             currentUser.getMemberID(), 
             name, 
             division, 
             department, 
-            roleToSave, // Gunakan variabel yang sudah melewati logika di atas
+            roleToSave, // Use the variable that has passed the logic above
             currentUser.getMemberID(), 
             "", 
             currentUser.getAccessRole()
         );
 
-        // Bagian Update ke Database (Perlu update method di DAO juga!)
+        // Update to Database (Requires updating the method in the DAO as well!)
         if (memberDAO.updateProfile(updatedRA)) {
             session.setAttribute("user", updatedRA);
             request.setAttribute("msgInfo", "Profil berhasil diperbarui!");
@@ -109,6 +96,7 @@ public class ProfileController extends HttpServlet {
         }
     }
 
+    // Feature: Change Password
     private void handleChangePassword(HttpServletRequest request, LabMember currentUser) {
         String newPass = request.getParameter("newPassword");
         String confirmPass = request.getParameter("confirmPassword");

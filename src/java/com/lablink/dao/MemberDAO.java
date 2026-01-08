@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.dao;
 import com.lablink.model.LabMember;
 import com.lablink.model.ResearchAssistant;
@@ -9,10 +5,7 @@ import com.lablink.util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;  
-/**
- *
- * @author Rudi Firdaus
- */
+
 public class MemberDAO {
     
     private Connection conn;
@@ -21,7 +14,7 @@ public class MemberDAO {
         conn = DBConnection.getConnection();
     }
     
-    // FITUR LOGIN: Mencari user berdasarkan username & password
+    // Fitur Login
     public LabMember login(String username, String password) {
         String sql = "SELECT * FROM tb_member WHERE username = ? AND password = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -32,7 +25,7 @@ public class MemberDAO {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // Return sebagai ResearchAssistant (karena saat ini baru ada class ini)
+                // Return as ResearchAssistant (because currently only this class exists)
                 return new ResearchAssistant(
                     rs.getString("member_id"),
                     rs.getString("name"),
@@ -47,11 +40,11 @@ public class MemberDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // Login gagal
+        return null; // Login failed
     }
 
-    // CREATE: Update insert query untuk kolom baru
-    // 1. UPDATE: Method Add Member dengan Default Credential
+    // Fitur Tambah Member
+    // Feature: Add Member with Default Credential
     public boolean addMember(ResearchAssistant ra) {
         String sql = "INSERT INTO tb_member (member_id, name, division, department, role_title, member_type, username, password, access_role) VALUES (?, ?, ?, ?, ?, 'RA', ?, ?, ?)";
         
@@ -64,12 +57,12 @@ public class MemberDAO {
             stmt.setString(4, ra.getDepartment());
             stmt.setString(5, ra.getRoleTitle());
             
-            // --- FITUR AUTO-REGISTER ---
-            // Username default = Member ID (NIM)
+            // Feature: Auto-Register
+            // Default username = Member ID (NIM)
             stmt.setString(6, ra.getMemberID());
-            // Password default = Member ID (NIM)
+            // Default password = Member ID (NIM)
             stmt.setString(7, ra.getMemberID());
-            // Role default
+            // Default role
             stmt.setString(8, "RESEARCH_ASSISTANT");
 
             return stmt.executeUpdate() > 0;
@@ -85,7 +78,7 @@ public class MemberDAO {
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, ra.getName());
-            stmt.setString(2, ra.getExpertDivision()); // Getter ini mengambil value untuk kolom 'division'
+            stmt.setString(2, ra.getExpertDivision()); // This getter gets the value for the 'division' column
             stmt.setString(3, ra.getDepartment());
             stmt.setString(4, ra.getRoleTitle());
             stmt.setString(5, ra.getAccessRole());
@@ -99,7 +92,6 @@ public class MemberDAO {
         }
     }
     
-    // Tambahkan ini di MemberDAO.java
     public boolean deleteMember(String id) {
         String sql = "DELETE FROM tb_member WHERE member_id = ?";
         try {
@@ -108,13 +100,13 @@ public class MemberDAO {
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            // Jika gagal (misal karena constraint FK), print error
+            // If it fails (e.g., due to FK constraint), print error
             e.printStackTrace();
             return false;
         }
     }
     
-    // 2. GET BY ID (Perbaikan Constructor)
+    // Fitur Ambil Member Berdasarkan ID
     public ResearchAssistant getMemberById(String id) {
         ResearchAssistant ra = null;
         String sql = "SELECT * FROM tb_member WHERE member_id = ?";
@@ -125,12 +117,10 @@ public class MemberDAO {
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
-                // SESUAIKAN DENGAN CONSTRUCTOR ResearchAssistant.java ANDA:
-                // (id, name, division, dept, role, username, password, accessRole)
                 ra = new ResearchAssistant(
                     rs.getString("member_id"),
                     rs.getString("name"),
-                    rs.getString("division"),    // Kolom DB: division
+                    rs.getString("division"),    // DB Column: division
                     rs.getString("department"),
                     rs.getString("role_title"),
                     rs.getString("username"),
@@ -144,7 +134,7 @@ public class MemberDAO {
         return ra;
     }
     
-    // 3. GET ALL (Untuk List) - Pastikan constructor di sini juga update
+    // Fitur Ambil Semua Member
     public List<ResearchAssistant> getAllMembers() {
         List<ResearchAssistant> list = new ArrayList<>();
         String sql = "SELECT * FROM tb_member";
@@ -169,9 +159,9 @@ public class MemberDAO {
         return list;
     }
     
-    // Method updateProfile yang SUDAH DIMODIFIKASI
+    // Fitur Update Profil
     public boolean updateProfile(ResearchAssistant ra) {
-        // Tambahkan role_title = ? ke dalam query
+        // Add role_title = ? to the query
         String sql = "UPDATE tb_member SET name = ?, division = ?, department = ?, role_title = ? WHERE member_id = ?";
         
         try (Connection conn = DBConnection.getConnection();
@@ -180,8 +170,8 @@ public class MemberDAO {
             stmt.setString(1, ra.getName());
             stmt.setString(2, ra.getExpertDivision());
             stmt.setString(3, ra.getDepartment());
-            stmt.setString(4, ra.getRoleTitle()); // Set parameter Jabatan
-            stmt.setString(5, ra.getMemberID());  // ID sebagai kunci WHERE (parameter terakhir)
+            stmt.setString(4, ra.getRoleTitle()); // Set Position parameter
+            stmt.setString(5, ra.getMemberID());  // ID as WHERE key (last parameter)
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -190,7 +180,7 @@ public class MemberDAO {
         }
     }
 
-    // FITUR: Ganti Password (jika belum ada)
+    // Fitur Ganti Password
     public boolean updatePassword(String memberID, String newPassword) {
         String sql = "UPDATE tb_member SET password = ? WHERE member_id = ?";
         try (Connection conn = DBConnection.getConnection();

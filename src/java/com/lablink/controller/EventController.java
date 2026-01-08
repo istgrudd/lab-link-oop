@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.controller;
 
 import com.lablink.dao.EventDAO;
@@ -19,10 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Rudi Firdaus
- */
 @WebServlet(name = "EventController", urlPatterns = {"/event"})
 public class EventController extends HttpServlet {
     private EventDAO eventDAO;
@@ -46,15 +38,15 @@ public class EventController extends HttpServlet {
 
         String action = request.getParameter("action");
         
-        // FITUR EDIT: Ambil data event by ID
+        // Fitur Edit Event
         if ("edit".equals(action)) {
             String id = request.getParameter("id");
             LabEvent e = eventDAO.getEventById(id);
             List<ResearchAssistant> listMember = memberDAO.getAllMembers(); 
             
-            // [BARU] Ambil data detail panitia
+            // Fitur Ambil Data Detail Panitia
             List<CommitteeMember> listCommittee = eventDAO.getCommitteeDetails(id);
-            request.setAttribute("listCommittee", listCommittee); // Kirim ke JSP
+            request.setAttribute("listCommittee", listCommittee);
             
             request.setAttribute("event", e);
             request.setAttribute("listMember", listMember);
@@ -62,9 +54,10 @@ public class EventController extends HttpServlet {
             return;
         }
 
-        // DEFAULT: Tampilkan List Event
+        // Fitur Tampilkan List Event
         List<LabEvent> listEvent = eventDAO.getAllEvents();
-        List<ResearchAssistant> listMember = memberDAO.getAllMembers(); // Untuk form Tambah Event
+        // Fitur Tambah Event
+        List<ResearchAssistant> listMember = memberDAO.getAllMembers(); 
         
         request.setAttribute("listEvent", listEvent);
         request.setAttribute("listMember", listMember);
@@ -75,7 +68,7 @@ public class EventController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Cek Hak Akses
+        // Fitur Cek Hak Akses
         HttpSession session = request.getSession(false);
         LabMember user = (LabMember) session.getAttribute("user");
         String role = user.getAccessRole();
@@ -89,6 +82,7 @@ public class EventController extends HttpServlet {
 
         String action = request.getParameter("action");
         
+        // Fitur Tambah Event
         if ("addEvent".equals(action)) {
             String id = request.getParameter("id");
             String name = request.getParameter("name");
@@ -99,6 +93,7 @@ public class EventController extends HttpServlet {
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.addEvent(e);
 
+        // Fitur Update Event
         } else if ("updateEvent".equals(action)) {
             String id = request.getParameter("id");
             String name = request.getParameter("name");
@@ -109,18 +104,19 @@ public class EventController extends HttpServlet {
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
             eventDAO.updateEvent(e);
             
+        // Fitur Hapus Event
         } else if ("deleteEvent".equals(action)) {
             String id = request.getParameter("id");
             eventDAO.deleteEvent(id);
+        // Fitur Tambah Panitia
         } else if ("addCommittee".equals(action)) {
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");
-            String roles = request.getParameter("roles"); // [BARU] Tangkap Role
+            String roles = request.getParameter("roles");
             
-            // Panggil method DAO yang baru
             eventDAO.addCommitteeMember(eventID, memberID, roles);
+        // Fitur Update Role Panitia
         } else if ("updateCommitteeRole".equals(action)) {
-            // [BARU] Logika Ganti Role
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");
             String newRole = request.getParameter("roles");
@@ -130,8 +126,8 @@ public class EventController extends HttpServlet {
             response.sendRedirect("event?action=edit&id=" + eventID);
             return;
 
+        // Fitur Hapus Panitia
         } else if ("removeCommittee".equals(action)) {
-            // [BARU] Logika Hapus Panitia
             String eventID = request.getParameter("eventID");
             String memberID = request.getParameter("memberID");
             

@@ -97,7 +97,6 @@
                         <div class="agenda-list">
                             <% if (agendaList != null && !agendaList.isEmpty()) { 
                                 for (AgendaItem item : agendaList) { 
-                                    // [PERBAIKAN 1] Parse String tanggal ke LocalDate
                                     LocalDate date = LocalDate.parse(item.getDate());
                             %>
                                 <div class="agenda-card">

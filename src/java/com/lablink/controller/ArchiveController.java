@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.controller;
 
 import com.lablink.dao.ArchiveDAO;
@@ -18,10 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Rudi Firdaus
- */
 @WebServlet(name = "ArchiveController", urlPatterns = {"/archive"})
 public class ArchiveController extends HttpServlet {
     private ArchiveDAO archiveDAO;
@@ -45,7 +37,7 @@ public class ArchiveController extends HttpServlet {
 
         String action = request.getParameter("action");
         
-        // JIKA KLIK "ARSIPKAN" DARI MENU PROYEK (F2)
+        // Fitur Membuat Arsip dari Proyek
         if ("createFromProject".equals(action)) {
             String projectID = request.getParameter("projectID");
             Project p = projectDAO.getProjectById(projectID);
@@ -55,7 +47,7 @@ public class ArchiveController extends HttpServlet {
             return;
         }
 
-        // DEFAULT: TAMPILKAN LIST ARSIP
+        // Fitur Tampilkan List Arsip
         List<Archive> listArchive = archiveDAO.getAllArchives();
         request.setAttribute("listArchive", listArchive);
         request.getRequestDispatcher("list-archive.jsp").forward(request, response);
@@ -67,6 +59,7 @@ public class ArchiveController extends HttpServlet {
         
         String action = request.getParameter("action");
         
+        // Fitur Simpan Arsip
         if ("saveArchive".equals(action)) {
             String id = request.getParameter("id");
             String projectID = request.getParameter("projectID");
@@ -79,6 +72,7 @@ public class ArchiveController extends HttpServlet {
             Archive a = new Archive(id, projectID, "", title, type, location, refNum, date, "");
             archiveDAO.addArchive(a);
             
+        // Fitur Hapus Arsip
         } else if ("deleteArchive".equals(action)) {
             String id = request.getParameter("id");
             archiveDAO.deleteArchive(id);

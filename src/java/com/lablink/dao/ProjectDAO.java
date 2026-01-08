@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.dao;
 
 import com.lablink.model.Project;
@@ -10,23 +6,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class ProjectDAO {
 
-    // 1. UPDATE: Insert dengan Deskripsi & Tim
+    // Fitur Tambah Proyek
     public boolean addProject(Project p, String[] teamMemberIDs) {
         String sql = "INSERT INTO tb_project (project_id, project_name, description, status, activity_type, division, leader_id, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Transaction Start
+            conn.setAutoCommit(false); // Start Transaction
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, p.getProjectID());
                 stmt.setString(2, p.getProjectName());
-                stmt.setString(3, p.getDescription()); // [BARU]
+                stmt.setString(3, p.getDescription());
                 stmt.setString(4, p.getStatus());
                 stmt.setString(5, p.getActivityType());
                 stmt.setString(6, p.getDivision());
@@ -36,12 +28,11 @@ public class ProjectDAO {
                 stmt.executeUpdate();
             }
 
-            // Insert Anggota Tim (Multi-Insert)
+            // Insert Team Members (Multi-Insert)
             if (teamMemberIDs != null) {
                 String sqlTeam = "INSERT INTO tb_project_member (project_id, member_id) VALUES (?, ?)";
                 try (PreparedStatement teamStmt = conn.prepareStatement(sqlTeam)) {
                     for (String memberID : teamMemberIDs) {
-                        // Jangan masukkan Leader lagi ke tim (opsional, tergantung aturan lab)
                         if (!memberID.equals(p.getLeaderID())) {
                             teamStmt.setString(1, p.getProjectID());
                             teamStmt.setString(2, memberID);
@@ -52,7 +43,7 @@ public class ProjectDAO {
                 }
             }
 
-            conn.commit(); // Transaction Commit
+            conn.commit(); // Commit Transaction
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,17 +51,17 @@ public class ProjectDAO {
         }
     }
 
-    // 2. UPDATE: Update dengan Deskripsi & Reset Tim
+    // Fitur Update Proyek
     public boolean updateProject(Project p, String[] teamMemberIDs) {
         String sql = "UPDATE tb_project SET project_name=?, description=?, status=?, activity_type=?, division=?, leader_id=?, start_date=?, end_date=? WHERE project_id=?";
         
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
 
-            // Update Data Utama
+            // Update Main Data
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, p.getProjectName());
-                stmt.setString(2, p.getDescription()); // [BARU]
+                stmt.setString(2, p.getDescription());
                 stmt.setString(3, p.getStatus());
                 stmt.setString(4, p.getActivityType());
                 stmt.setString(5, p.getDivision());
@@ -81,14 +72,14 @@ public class ProjectDAO {
                 stmt.executeUpdate();
             }
 
-            // Reset Tim: Hapus semua anggota lama dulu, lalu masukkan yang baru
+            // Reset Team: Delete all old members first, then insert the new ones
             String deleteTeam = "DELETE FROM tb_project_member WHERE project_id = ?";
             try (PreparedStatement delStmt = conn.prepareStatement(deleteTeam)) {
                 delStmt.setString(1, p.getProjectID());
                 delStmt.executeUpdate();
             }
 
-            // Insert Tim Baru
+            // Insert New Team
             if (teamMemberIDs != null) {
                 String insertTeam = "INSERT INTO tb_project_member (project_id, member_id) VALUES (?, ?)";
                 try (PreparedStatement teamStmt = conn.prepareStatement(insertTeam)) {
@@ -111,7 +102,7 @@ public class ProjectDAO {
         }
     }
 
-    // 3. UPDATE: Ambil Data + Deskripsi + List ID Tim
+    // Fitur Ambil Proyek Berdasarkan ID
     public Project getProjectById(String id) {
         String sql = "SELECT * FROM tb_project WHERE project_id = ?";
         Project p = null;
@@ -123,19 +114,19 @@ public class ProjectDAO {
                 p = new Project(
                     rs.getString("project_id"),
                     rs.getString("project_name"),
-                    rs.getString("description"), // [BARU]
+                    rs.getString("description"),
                     rs.getString("status"),
                     rs.getString("activity_type"),
                     rs.getString("division"),
                     rs.getString("leader_id"),
-                    "", // Leader name nanti diambil lewat join atau biarkan kosong utk edit
+                    "", // Leader name will be taken via join or left empty for editing
                     rs.getString("start_date"),
                     rs.getString("end_date")
                 );
             }
         } catch (SQLException e) { e.printStackTrace(); }
 
-        // Populate Team IDs (Agar checkbox bisa ter-centang otomatis saat edit)
+        // Populate Team IDs (So that the checkboxes can be checked automatically when editing)
         if (p != null) {
             String sqlTeam = "SELECT member_id FROM tb_project_member WHERE project_id = ?";
             try (Connection conn = DBConnection.getConnection();
@@ -150,10 +141,9 @@ public class ProjectDAO {
         return p;
     }
 
-    // 4. UPDATE: getAllProjects (Ambil Description)
+    // Fitur Ambil Semua Proyek
     public List<Project> getAllProjects() {
         List<Project> list = new ArrayList<>();
-        // Query disederhanakan, ambil deskripsi
         String sql = "SELECT p.*, m.name as leader_name FROM tb_project p LEFT JOIN tb_member m ON p.leader_id = m.member_id ORDER BY p.start_date DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -164,7 +154,7 @@ public class ProjectDAO {
                 Project p = new Project(
                     rs.getString("project_id"),
                     rs.getString("project_name"),
-                    rs.getString("description"), // [BARU]
+                    rs.getString("description"),
                     rs.getString("status"),
                     rs.getString("activity_type"),
                     rs.getString("division"),
@@ -173,7 +163,7 @@ public class ProjectDAO {
                     rs.getString("start_date"),
                     rs.getString("end_date")
                 );
-                // Load nama tim untuk display di tabel/modal
+                // Load team names for display in table/modal
                 populateTeamNames(p);
                 list.add(p);
             }
@@ -194,7 +184,7 @@ public class ProjectDAO {
     }
     
     public boolean deleteProject(String id) {
-        // Hapus relasi dulu (constraint FK)
+        // Delete the relation first (FK constraint)
         String sqlRel = "DELETE FROM tb_project_member WHERE project_id = ?";
         String sqlProj = "DELETE FROM tb_project WHERE project_id = ?";
         try (Connection conn = DBConnection.getConnection()) {
@@ -212,5 +202,5 @@ public class ProjectDAO {
         } catch (SQLException e) { return false; }
     }
     
-    // (Method getTeamDetails dihapus/disatukan karena sudah ada di getProjectById)
+    // (getTeamDetails method was deleted/merged because it's already in getProjectById)
 }

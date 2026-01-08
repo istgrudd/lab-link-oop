@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.controller;
 
 import com.lablink.dao.ProjectDAO;
@@ -20,10 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Rudi Firdaus
- */
 @WebServlet(name = "ProjectController", urlPatterns = {"/project"})
 public class ProjectController extends HttpServlet {
 
@@ -40,7 +32,7 @@ public class ProjectController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Cek Session
+        // Feature: Check Session
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
@@ -49,15 +41,15 @@ public class ProjectController extends HttpServlet {
 
         String action = request.getParameter("action");
         
-        // [PENTING] Mencegah Error 500 (NullPointerException)
+        // Important: Prevent NullPointerException
         if (action == null) {
             action = "list";
         }
 
-        // 2. Handle Action
+        // Feature: Handle Action
         switch (action) {
             case "add":
-                // Kirim daftar member untuk dropdown Ketua
+                // Send member list for Leader dropdown
                 request.setAttribute("listMember", memberDAO.getAllMembers());
                 request.getRequestDispatcher("edit-project.jsp").forward(request, response);
                 break;
@@ -65,12 +57,13 @@ public class ProjectController extends HttpServlet {
             case "edit":
                 String id = request.getParameter("id");
                 Project p = projectDAO.getProjectById(id);
-                // Kirim data proyek & member untuk form edit
+                // Send project & member data for edit form
                 request.setAttribute("project", p);
                 request.setAttribute("listMember", memberDAO.getAllMembers());
                 request.getRequestDispatcher("edit-project.jsp").forward(request, response);
                 break;
-
+            
+            // Feature: Delete Project
             case "delete":
                 String deleteId = request.getParameter("id");
                 projectDAO.deleteProject(deleteId);
@@ -78,7 +71,7 @@ public class ProjectController extends HttpServlet {
                 break;
 
             default: // "list"
-                // Ambil data untuk tabel
+                // Get data for table
                 request.setAttribute("listProject", projectDAO.getAllProjects());
                 request.setAttribute("listMember", memberDAO.getAllMembers());
                 request.getRequestDispatcher("list-project.jsp").forward(request, response);
@@ -93,7 +86,7 @@ public class ProjectController extends HttpServlet {
         HttpSession session = request.getSession(false);
         LabMember user = (LabMember) session.getAttribute("user");
         
-        // Cek Role (Hanya Internal & Ketua Lab yang boleh)
+        // Feature: Check Role (Only Internal & Lab Head allowed)
         if (user == null || "HEAD_OF_EXTERNAL".equals(user.getAccessRole())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak.");
             return;
@@ -101,7 +94,7 @@ public class ProjectController extends HttpServlet {
 
         String action = request.getParameter("action");
         
-        // Handle Save (Tambah) & Update (Edit)
+        // Feature: Save (Add) & Update (Edit)
         if ("save".equals(action) || "update".equals(action)) {
             String id = request.getParameter("projectID");
             String name = request.getParameter("projectName");
@@ -115,27 +108,28 @@ public class ProjectController extends HttpServlet {
 
             String[] teamMemberIDs = request.getParameterValues("teamMembers");
             
-            // Generate ID jika baru
+            // Generate ID if new
             if (id == null || id.isEmpty()) {
                 id = UUID.randomUUID().toString().substring(0, 8);
             }
 
-            // Buat objek Project
+            // Create Project object
             Project p = new Project(id, name, description, status, category, division, leaderID, "", startDate, endDate);
 
             if ("update".equals(action)) {
-                // [BARU] Kirim array teamMemberIDs ke DAO
+                // Send teamMemberIDs array to DAO
                 projectDAO.updateProject(p, teamMemberIDs);
             } else {
-                // [BARU] Kirim array teamMemberIDs ke DAO
+                // Send teamMemberIDs array to DAO
                 projectDAO.addProject(p, teamMemberIDs);
             }
+        // Feature: Delete Project
         } else if ("delete".equals(action)) {
             String id = request.getParameter("id");
             projectDAO.deleteProject(id);
         }
         
-        // Redirect kembali ke list
+        // Redirect back to list
         response.sendRedirect("project");
     }
 }

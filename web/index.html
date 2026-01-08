@@ -1,31 +1,703 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
--->
-<html>
-    <head>
-        <title>LabLink - Dashboard</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-light">
-        
-        <nav class="navbar navbar-dark bg-primary mb-4">
-            <div class="container">
-                <a class="navbar-brand" href="dashboard">LabLink System</a>
-            </div>
-        </nav>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabLink - Sistem Manajemen Laboratorium Terpadu</title>
+    <meta name="description" content="LabLink adalah sistem manajemen terpadu untuk laboratorium riset. Kelola proyek, event, publikasi, dan anggota tim dalam satu platform.">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="premium-body">
 
-        <div class="container text-center mt-5">
-            <h1 class="display-4">Selamat Datang di LabLink</h1>
-            <p class="lead">Sistem Manajemen Terpadu Laboratorium Riset</p>
-            <hr class="my-4">
-            <p>Silakan pilih menu di bawah ini untuk memulai:</p>
+    <!-- Ambient Background Effects -->
+    <div class="ambient-light light-1"></div>
+    <div class="ambient-light light-2"></div>
+    <div class="ambient-light light-3"></div>
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar navbar-expand-lg fixed-top p-3">
+        <div class="container nav-capsule">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <div class="logo-box">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <span class="brand-text">LabLink<span class="text-primary">.id</span></span>
+            </a>
             
-            <a class="btn btn-primary btn-lg" href="member" role="button">Manajemen Anggota (RA)</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-dark"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav gap-lg-4 my-3 my-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#features">Fitur</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">Tentang</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#showcase">Showcase</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">Tim</a></li>
+                </ul>
+            </div>
+
+            <div class="d-none d-lg-block">
+                <a href="login.jsp" class="btn btn-login-portal" id="loginBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i> Masuk Portal
+                </a>
+            </div>
         </div>
-        
-    </body>
+    </nav>
+
+    <!-- ========== HERO SECTION ========== -->
+    <header class="hero-section text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="badge-tech mb-4 animate-up">
+                        <i class="fas fa-bolt text-warning me-2"></i> Versi Terbaru 2.0 - Semester Ganjil 2025/2026
+                    </div>
+                    <h1 class="hero-title mb-4 animate-up delay-1">
+                        <span class="typing-wrapper">
+                            <span id="typingText"></span><span class="cursor">|</span>
+                        </span><br>
+                        <span class="text-gradient">Kolaborasi Tanpa Batas.</span>
+                    </h1>
+                    <p class="hero-desc mb-5 animate-up delay-2">
+                        Sistem terintegrasi untuk <strong>MBC Laboratory - Telkom University</strong>. 
+                        Kelola proyek riset, kepanitiaan event, publikasi ilmiah, dan administrasi asisten 
+                        dalam satu ekosistem digital yang efisien dan modern.
+                    </p>
+                    
+                    <div class="d-flex justify-content-center gap-3 mb-5 animate-up delay-3 flex-wrap">
+                        <a href="login.jsp" class="btn btn-primary-glow">
+                            <i class="fas fa-rocket me-2"></i> Mulai Sekarang
+                        </a>
+                        <a href="#features" class="btn btn-glass">
+                            <i class="fas fa-play-circle me-2"></i> Pelajari Fitur
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Counter -->
+            <div class="stats-counter row justify-content-center g-4 mb-5 animate-up delay-3">
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <h3 class="stat-number" data-target="50">0</h3>
+                        <p class="stat-label">Anggota Aktif</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                        <h3 class="stat-number" data-target="25">0</h3>
+                        <p class="stat-label">Proyek Riset</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                        <h3 class="stat-number" data-target="12">0</h3>
+                        <p class="stat-label">Event Dikelola</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                        <h3 class="stat-number" data-target="35">0</h3>
+                        <p class="stat-label">Publikasi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Dashboard Mockup -->
+            <div class="dashboard-mockup-wrapper animate-up delay-4">
+                <div class="dashboard-mockup">
+                    <div class="mockup-header">
+                        <div class="window-controls">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="address-bar">lablink.telkomuniversity.ac.id/dashboard</span>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-sidebar">
+                            <div class="mock-menu-item active"><i class="fas fa-home"></i></div>
+                            <div class="mock-menu-item"><i class="fas fa-users"></i></div>
+                            <div class="mock-menu-item"><i class="fas fa-folder"></i></div>
+                            <div class="mock-menu-item"><i class="fas fa-calendar"></i></div>
+                            <div class="mock-menu-item"><i class="fas fa-file-alt"></i></div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mock-card"></div>
+                            <div class="mock-card"></div>
+                            <div class="mock-card"></div>
+                            <div class="mock-card wide"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="floating-widget widget-left">
+                        <div class="icon-circle bg-success-light text-success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <strong>Proyek Selesai</strong>
+                            <span>12 Paper Publish</span>
+                        </div>
+                    </div>
+                    <div class="floating-widget widget-right">
+                        <div class="icon-circle bg-primary-light text-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <strong>Tim Aktif</strong>
+                            <span>4 Divisi Riset</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mockup-shadow"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== FEATURES SECTION ========== -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header text-center mb-5 reveal">
+                <span class="section-badge">Keunggulan Sistem</span>
+                <h2 class="section-title">Platform All-in-One untuk Lab Riset</h2>
+                <p class="section-subtitle">Semua kebutuhan manajemen laboratorium dalam satu tempat</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Feature 1: Project Tracking -->
+                <div class="col-lg-7 reveal">
+                    <div class="bento-card bg-dark-teal text-white h-100">
+                        <div class="bento-content">
+                            <div class="feature-badge mb-3">
+                                <i class="fas fa-star"></i> Fitur Utama
+                            </div>
+                            <h3><i class="fas fa-project-diagram me-2"></i> Project Tracking</h3>
+                            <p class="mt-3 text-white-50">
+                                Monitor siklus hidup proyek riset dari inisiasi hingga publikasi. 
+                                Dukungan penuh untuk timeline, anggaran, anggota tim, dan status pengerjaan real-time.
+                            </p>
+                            <div class="mt-4 d-flex gap-2 flex-wrap">
+                                <span class="feature-tag">Riset Internal</span>
+                                <span class="feature-tag">PKM</span>
+                                <span class="feature-tag">Publikasi</span>
+                                <span class="feature-tag">Timeline</span>
+                            </div>
+                        </div>
+                        <div class="bento-bg-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 2: Event Organizer -->
+                <div class="col-lg-5 reveal">
+                    <div class="bento-card bg-white h-100 border-glass">
+                        <div class="icon-square bg-orange-light text-orange mb-3">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4>Event Organizer</h4>
+                        <p class="text-muted">
+                            Kelola workshop, seminar, dan webinar lab. Atur kepanitiaan, 
+                            jobdesk, dan jadwal dengan mudah dan terstruktur.
+                        </p>
+                        <ul class="feature-list mt-3">
+                            <li><i class="fas fa-check-circle text-success"></i> Manajemen Panitia</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Tracking Peserta</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Reminder Otomatis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Member Management -->
+                <div class="col-lg-4 reveal">
+                    <div class="bento-card bg-white h-100 border-glass">
+                        <div class="icon-square bg-purple-light text-purple mb-3">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <h4>Member Management</h4>
+                        <p class="text-muted small">
+                            Kelola data asisten riset, dosen pembimbing, dan kepala lab dengan RBAC 
+                            (Role-Based Access Control) yang aman.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 4: RBAC Security -->
+                <div class="col-lg-4 reveal">
+                    <div class="bento-card bg-white h-100 border-glass">
+                        <div class="icon-square bg-teal-light text-teal mb-3">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>RBAC Security</h4>
+                        <p class="text-muted small">
+                            Akses bertingkat (Head of Lab, Anggota Internal, Anggota Eksternal, RA) 
+                            menjamin keamanan data lab.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Archive & HKI -->
+                <div class="col-lg-4 reveal">
+                    <div class="bento-card bg-white h-100 border-glass">
+                        <div class="icon-square bg-success-light text-success mb-3">
+                            <i class="fas fa-archive"></i>
+                        </div>
+                        <h4>Archive & HKI</h4>
+                        <p class="text-muted small">
+                            Arsip publikasi ilmiah dan HKI terpusat. Lacak paper, jurnal, 
+                            paten, dan hak cipta dengan mudah.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 6: Reports -->
+                <div class="col-lg-12 reveal">
+                    <div class="bento-card bg-gradient-primary text-white d-flex align-items-center justify-content-between p-4 flex-wrap gap-4">
+                        <div>
+                            <h3><i class="fas fa-print me-2"></i> Laporan Otomatis</h3>
+                            <p class="text-white-50 mb-0">
+                                Generate laporan kinerja lab dalam format siap cetak. 
+                                Export ke PDF, Excel, atau langsung print dengan satu klik.
+                            </p>
+                        </div>
+                        <div class="report-icons d-flex gap-3">
+                            <div class="icon-circle bg-white-10">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="icon-circle bg-white-10">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="icon-circle bg-white-10">
+                                <i class="fas fa-print"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ABOUT SECTION ========== -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 reveal">
+                    <div class="about-image-wrapper">
+                        <div class="about-image-card">
+                            <div class="about-icon-grid">
+                                <div class="about-icon-item">
+                                    <i class="fas fa-microscope"></i>
+                                    <span>Riset</span>
+                                </div>
+                                <div class="about-icon-item">
+                                    <i class="fas fa-code"></i>
+                                    <span>Development</span>
+                                </div>
+                                <div class="about-icon-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>Publikasi</span>
+                                </div>
+                                <div class="about-icon-item">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>Achievement</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="about-float-badge">
+                            <i class="fas fa-flask"></i>
+                            <span>MBC Lab</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 reveal">
+                    <span class="section-badge">Tentang LabLink</span>
+                    <h2 class="section-title mt-3">Solusi Terpadu untuk Laboratorium Modern</h2>
+                    <p class="text-muted mt-4">
+                        <strong>LabLink</strong> adalah Sistem Manajemen Terpadu yang dikembangkan 
+                        untuk mengatasi kompleksitas pengelolaan laboratorium riset di lingkungan 
+                        akademik. Sistem ini didesain khusus untuk <strong>MBC Laboratory - Telkom University</strong>.
+                    </p>
+                    
+                    <div class="about-features mt-4">
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h5>Problematika Dual Role</h5>
+                                <p class="text-muted small mb-0">
+                                    Mengatasi kompleksitas saat anggota memiliki peran ganda 
+                                    (sebagai peneliti sekaligus panitia event)
+                                </p>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h5>Integrasi Data Terpusat</h5>
+                                <p class="text-muted small mb-0">
+                                    Semua data proyek, event, publikasi, dan HKI tersimpan 
+                                    dalam satu database terpusat
+                                </p>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h5>Akses Role-Based</h5>
+                                <p class="text-muted small mb-0">
+                                    Kepala Lab, Dosen, Asisten Internal & Eksternal memiliki 
+                                    akses sesuai kapasitas masing-masing
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SHOWCASE SECTION ========== -->
+    <section id="showcase" class="showcase-section">
+        <div class="container">
+            <div class="section-header text-center mb-5 reveal">
+                <span class="section-badge">Showcase</span>
+                <h2 class="section-title">Lihat LabLink Beraksi</h2>
+                <p class="section-subtitle">Antarmuka modern yang intuitif dan mudah digunakan</p>
+            </div>
+
+            <div class="showcase-grid reveal">
+                <div class="showcase-item showcase-main">
+                    <div class="showcase-card">
+                        <div class="showcase-header">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <div class="showcase-preview">
+                            <div class="preview-stats">
+                                <div class="preview-stat-card"></div>
+                                <div class="preview-stat-card"></div>
+                                <div class="preview-stat-card"></div>
+                                <div class="preview-stat-card"></div>
+                            </div>
+                            <div class="preview-chart"></div>
+                        </div>
+                        <p>Pantau semua aktivitas lab dari satu tempat</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-card">
+                        <div class="showcase-header">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Proyek</span>
+                        </div>
+                        <div class="showcase-preview mini">
+                            <div class="preview-list-item"></div>
+                            <div class="preview-list-item"></div>
+                            <div class="preview-list-item"></div>
+                        </div>
+                        <p>Kelola proyek riset</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-card">
+                        <div class="showcase-header">
+                            <i class="fas fa-users"></i>
+                            <span>Anggota</span>
+                        </div>
+                        <div class="showcase-preview mini">
+                            <div class="preview-avatar-grid">
+                                <div class="preview-avatar"></div>
+                                <div class="preview-avatar"></div>
+                                <div class="preview-avatar"></div>
+                                <div class="preview-avatar"></div>
+                            </div>
+                        </div>
+                        <p>Manajemen member</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-card">
+                        <div class="showcase-header">
+                            <i class="fas fa-calendar"></i>
+                            <span>Event</span>
+                        </div>
+                        <div class="showcase-preview mini">
+                            <div class="preview-calendar"></div>
+                        </div>
+                        <p>Jadwal & kepanitiaan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TEAM SECTION ========== -->
+    <section id="team" class="team-section">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 reveal">
+                    <span class="section-badge">Tim Pengembang</span>
+                    <h2 class="section-title mt-3">Dikembangkan dengan <span class="text-danger">❤</span></h2>
+                    <p class="text-muted mt-4">
+                        LabLink dikembangkan sebagai proyek tugas besar mata kuliah 
+                        <strong>Pemrograman Berorientasi Objek (PBO)</strong> Semester Ganjil 2025/2026 
+                        di <strong>Telkom University</strong>.
+                    </p>
+                    
+                    <div class="tech-stack mt-4">
+                        <span class="tech-badge"><i class="fab fa-java"></i> Java</span>
+                        <span class="tech-badge"><i class="fas fa-server"></i> Servlet</span>
+                        <span class="tech-badge"><i class="fas fa-code"></i> JSP</span>
+                        <span class="tech-badge"><i class="fas fa-database"></i> MySQL</span>
+                        <span class="tech-badge"><i class="fab fa-bootstrap"></i> Bootstrap</span>
+                    </div>
+                </div>
+                <div class="col-lg-6 reveal">
+                    <div class="team-card">
+                        <div class="team-logo">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h4>MBC Laboratory</h4>
+                        <p class="text-muted">Telkom University</p>
+                        <hr>
+                        <div class="team-info">
+                            <div class="team-info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Informatika</span>
+                            </div>
+                            <div class="team-info-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>2025/2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA SECTION ========== -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-card reveal">
+                <div class="cta-content text-center">
+                    <h2>Siap Memulai?</h2>
+                    <p class="text-muted mb-4">
+                        Login ke portal LabLink dan mulai kelola laboratorium Anda dengan lebih efisien
+                    </p>
+                    <a href="login.jsp" class="btn btn-primary-glow btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login Sekarang
+                    </a>
+                </div>
+                <div class="cta-decoration">
+                    <div class="cta-circle"></div>
+                    <div class="cta-circle"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row g-4 py-5">
+                <div class="col-lg-4">
+                    <div class="footer-brand d-flex align-items-center gap-2 mb-3">
+                        <div class="logo-box">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <span class="brand-text text-white">LabLink<span class="text-primary">.id</span></span>
+                    </div>
+                    <p class="text-white-50 small">
+                        Sistem Manajemen Terpadu untuk Laboratorium Riset. 
+                        Dikembangkan untuk MBC Laboratory - Telkom University.
+                    </p>
+                    <div class="footer-social mt-3">
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fas fa-globe"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h6 class="footer-title">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="#features">Fitur</a></li>
+                        <li><a href="#about">Tentang</a></li>
+                        <li><a href="#showcase">Showcase</a></li>
+                        <li><a href="login.jsp">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h6 class="footer-title">Fitur</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Proyek Riset</a></li>
+                        <li><a href="#">Event</a></li>
+                        <li><a href="#">Publikasi</a></li>
+                        <li><a href="#">HKI</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="footer-title">Kontak</h6>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> Telkom University, Bandung</li>
+                        <li><i class="fas fa-envelope"></i> mbc.lab@telkomuniversity.ac.id</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center py-4 border-top border-secondary">
+                <p class="text-white-50 small mb-0">
+                    &copy; 2025-2026 <strong>LabLink</strong>. Dikembangkan oleh Tim PBO - Telkom University. 
+                    All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Login Button -->
+    <div class="mobile-login d-lg-none">
+        <a href="login.jsp" class="btn btn-primary-glow w-100">
+            <i class="fas fa-sign-in-alt me-2"></i> Masuk Portal
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ========== TYPING ANIMATION ==========
+        const phrases = [
+            "Manajemen Riset Cerdas.",
+            "Kolaborasi Tim Efektif.",
+            "Tracking Proyek Real-time.",
+            "Dokumentasi Terintegrasi."
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingElement = document.getElementById('typingText');
+
+        function typeEffect() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typeSpeed = 2000; // Pause at end
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 500; // Pause before next phrase
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        typeEffect();
+
+        // ========== STATS COUNTER ANIMATION ==========
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 200;
+
+        const animateCounter = (counter) => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / speed;
+
+            if (count < target) {
+                counter.innerText = Math.ceil(count + increment);
+                setTimeout(() => animateCounter(counter), 1);
+            } else {
+                counter.innerText = target + '+';
+            }
+        };
+
+        // Intersection Observer for counters
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    animateCounter(counter);
+                    counterObserver.unobserve(counter);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => counterObserver.observe(counter));
+
+        // ========== SCROLL REVEAL ANIMATION ==========
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ========== PARALLAX MOCKUP EFFECT ==========
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            const mockup = document.querySelector('.dashboard-mockup');
+            
+            if(mockup && scrolled < 600) {
+                const rotateVal = 15 - (scrolled * 0.05); 
+                const scaleVal = 0.95 + (scrolled * 0.0002);
+                
+                const finalRotate = rotateVal < 0 ? 0 : rotateVal;
+                const finalScale = scaleVal > 1 ? 1 : scaleVal;
+
+                mockup.style.transform = `perspective(1000px) rotateX(${finalRotate}deg) scale(${finalScale})`;
+            }
+        });
+
+        // ========== NAVBAR SCROLL EFFECT ==========
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.nav-capsule');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ========== SMOOTH SCROLL ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
 </html>

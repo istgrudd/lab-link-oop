@@ -1,31 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.model;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class ResearchAssistant extends LabMember {
-    private String expertDivision; // Misal: Big Data
-    private String department;     // Misal: Internal
-    private String roleTitle;      // Misal: Head of Division
+    private String expertDivision; // e.g., Big Data
+    private String department;     // e.g., Internal
+    private String roleTitle;      // e.g., Head of Division
 
     public ResearchAssistant(String id, String name, String division, String dept, String role, 
                              String username, String password, String accessRole) {
-        // Oper data login ke superclass
+        // Pass login data to superclass
         super(id, name, username, password, accessRole);
         this.expertDivision = division;
         this.department = dept;
         this.roleTitle = role;
     }
 
-    // Implementasi Polymorphism [cite: 82]
+    // Polymorphism Implementation
     @Override
     public int calculateWorkload() {
-        // Logika sederhana: workload dasar 10 jam + bonus jika punya jabatan
+        // Simple logic: base workload 10 hours + bonus if they have a position
         int baseLoad = 10;
         if (roleTitle != null && !roleTitle.equalsIgnoreCase("Staff")) {
             baseLoad += 5;
@@ -33,7 +25,7 @@ public class ResearchAssistant extends LabMember {
         return baseLoad;
     }
 
-    // Getter Setter
+    // Getter and Setter
     public String getExpertDivision() { return expertDivision; }
     public String getDepartment() { return department; }
     public String getRoleTitle() { return roleTitle; }

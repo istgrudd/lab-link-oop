@@ -1,19 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.model;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class AgendaItem {
-    private String date;        // Tanggal (Deadline Proyek atau Tanggal Event)
-    private String title;       // Nama Proyek / Kegiatan
-    private String category;    // "Proyek" atau "Event"
-    private String info;        // Info tambahan (Misal: "Deadline" atau nama PIC)
-    private String badgeColor;  // Warna badge untuk tampilan (success/warning)
+    // Date (Project Deadline or Event Date)
+    private String date;
+    // Project Name / Activity
+    private String title;
+    // "Project" or "Event"
+    private String category;
+    // Additional Info (e.g., "Deadline" or PIC name)
+    private String info;
+    // Badge color for display (success/warning)
+    private String badgeColor;
 
     public AgendaItem(String date, String title, String category, String info, String badgeColor) {
         this.date = date;
@@ -23,6 +20,7 @@ public class AgendaItem {
         this.badgeColor = badgeColor;
     }
 
+    // Getter
     public String getDate() { return date; }
     public String getTitle() { return title; }
     public String getCategory() { return category; }

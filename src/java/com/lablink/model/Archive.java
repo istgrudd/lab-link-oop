@@ -1,24 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.model;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class Archive {
     private String archiveID;
     private String projectID;
-    private String projectName; // Helper untuk display
+    private String projectName; // Helper for display
     private String title;
-    private String type;        // Publikasi / HKI
-    private String publishLocation; // Nama Jurnal / HKI
-    private String referenceNumber; // DOI / No Reg
+    private String type;        // Publication / IPR
+    private String publishLocation; // Journal Name / IPR
+    private String referenceNumber; // DOI / Reg No
     private String publishDate;
     
-    // Kita ambil Leader dari Project sebagai Penulis Utama
+    // We take the Leader from the Project as the Main Author
     private String authorName; 
 
     public Archive(String archiveID, String projectID, String projectName, String title, 

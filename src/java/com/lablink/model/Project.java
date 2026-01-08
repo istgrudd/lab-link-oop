@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class Project implements IReportable {
     private String projectID;
     private String projectName;
@@ -24,15 +16,15 @@ public class Project implements IReportable {
     private String startDate;
     private String endDate;
     
-    // List untuk menampung nama/anggota tim (Opsional, untuk display di view)
+    // List to hold team member names (Optional, for display in view)
     private List<String> teamMembers = new ArrayList<>();
-    // List untuk menampung ID anggota tim (untuk logic edit/checklist)
+    // List to hold team member IDs (for edit/checklist logic)
     private List<String> teamMemberIDs = new ArrayList<>();
 
     public Project(String id, String name, String desc, String status, String type, String division, String leaderID, String leaderName, String startDate, String endDate) {
         this.projectID = id;
         this.projectName = name;
-        this.description = desc; // [BARU]
+        this.description = desc;
         this.status = status;
         this.activityType = type;
         this.division = division;
@@ -42,14 +34,14 @@ public class Project implements IReportable {
         this.endDate = endDate;
     }
 
-    // Implementasi Interface IReportable 
+    // Implementation of IReportable Interface
     @Override
     public String generateReportString() {
         return "Proyek: " + projectName + " (Lead: " + leaderName + ")";
     }
 
-    // Getter Setter
-    public String getDescription() { return description; } // [BARU]
+    // Getter and Setter
+    public String getDescription() { return description; }
     public String getProjectID() { return projectID; }
     public String getProjectName() { return projectName; }
     public String getStatus() { return status; }
@@ -62,6 +54,6 @@ public class Project implements IReportable {
     public String getEndDate() { return endDate; }
     
     public List<String> getTeamMembers() { return teamMembers; }
-    public List<String> getTeamMemberIDs() { return teamMemberIDs; } // [BARU]
+    public List<String> getTeamMemberIDs() { return teamMemberIDs; }
     public void addTeamMember(String name) { this.teamMembers.add(name); }
 }

@@ -1,22 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.model;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public abstract class LabMember {
     protected String memberID;
     protected String name;
-    // Pastikan 3 atribut ini ada:
+    // Make sure these 3 attributes exist:
     protected String username;
     protected String password;
     protected String accessRole;
 
-    // Pastikan Constructor ini menerima 5 parameter:
+    // Make sure this Constructor accepts 5 parameters:
     public LabMember(String memberID, String name, String username, String password, String accessRole) {
         this.memberID = memberID;
         this.name = name;
@@ -25,10 +17,11 @@ public abstract class LabMember {
         this.accessRole = accessRole;
     }
 
+    // Getter
     public String getMemberID() { return memberID; }
     public String getName() { return name; }
-    public String getAccessRole() { return accessRole; } // Getter ini penting
-    public String getPassword() { return password; } // Tambahkan ini juga untuk validasi ganti password nanti
+    public String getAccessRole() { return accessRole; } // This getter is important
+    public String getPassword() { return password; } // Add this also for password change validation later
 
     public abstract int calculateWorkload();
 }

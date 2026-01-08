@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.dao;
 
 import com.lablink.model.Archive;
@@ -10,13 +6,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rudi Firdaus
- */
 public class ArchiveDAO {
 
-    // CREATE
+    // Fitur Tambah Arsip
     public boolean addArchive(Archive a) {
         String sql = "INSERT INTO tb_archive (archive_id, project_id, title, archive_type, publish_location, reference_number, publish_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -32,7 +24,7 @@ public class ArchiveDAO {
         } catch (SQLException e) { return false; }
     }
 
-    // READ ALL (Join dengan Project & Member untuk dapat Nama Leader)
+    // Fitur Ambil Semua Arsip
     public List<Archive> getAllArchives() {
         List<Archive> list = new ArrayList<>();
         String sql = "SELECT a.*, p.project_name, m.name as leader_name " +
@@ -62,7 +54,7 @@ public class ArchiveDAO {
         return list;
     }
     
-    // DELETE
+    // Fitur Hapus Arsip
     public boolean deleteArchive(String id) {
         String sql = "DELETE FROM tb_archive WHERE archive_id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -72,7 +64,7 @@ public class ArchiveDAO {
         } catch (SQLException e) { return false; }
     }
     
-    // CEK APAKAH PROJECT SUDAH DIARSIPKAN? (Untuk menyembunyikan tombol Arsip di F2)
+    // Fitur Cek Status Arsip Proyek
     public boolean isProjectArchived(String projectID) {
         String sql = "SELECT 1 FROM tb_archive WHERE project_id = ?";
         try (Connection conn = DBConnection.getConnection();

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.lablink.controller;
 
 import com.lablink.dao.MemberDAO;
@@ -20,10 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Rudi Firdaus
- */
 @WebServlet(name = "ReportController", urlPatterns = {"/report"})
 public class ReportController extends HttpServlet {
     
@@ -48,11 +40,11 @@ public class ReportController extends HttpServlet {
             return;
         }
 
-        // 1. Ambil Data Ringkasan (Angka-angka)
+        // Fitur Ambil Data Ringkasan
         Map<String, Integer> summary = reportDAO.getLabSummary();
         request.setAttribute("summary", summary);
         
-        // 2. Ambil Data Detail untuk Tabel Rekap
+        // Fitur Ambil Data Detail
         List<ResearchAssistant> listMember = memberDAO.getAllMembers();
         List<Project> listProject = projectDAO.getAllProjects();
         
