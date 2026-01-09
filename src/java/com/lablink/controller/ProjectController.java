@@ -125,13 +125,21 @@ public class ProjectController extends HttpServlet {
                     endDate);
 
             if ("update".equals(action)) {
-                projectDAO.updateProject(p, teamMemberIDs);
-                logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "PROJECT", id, name,
-                        "Mengupdate proyek: " + name);
+                boolean success = projectDAO.updateProject(p, teamMemberIDs);
+                if (success) {
+                    logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "PROJECT", id, name,
+                            "Mengupdate proyek: " + name);
+                } else {
+                    System.err.println("[ProjectController] GAGAL update project: " + id);
+                }
             } else {
-                projectDAO.addProject(p, teamMemberIDs);
-                logDAO.log(user.getMemberID(), user.getName(), "CREATE", "PROJECT", id, name,
-                        "Membuat proyek baru: " + name);
+                boolean success = projectDAO.addProject(p, teamMemberIDs);
+                if (success) {
+                    logDAO.log(user.getMemberID(), user.getName(), "CREATE", "PROJECT", id, name,
+                            "Membuat proyek baru: " + name);
+                } else {
+                    System.err.println("[ProjectController] GAGAL menambah project: " + id + " - " + name);
+                }
             }
             // Feature: Delete Project
         } else if ("delete".equals(action)) {

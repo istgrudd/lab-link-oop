@@ -124,9 +124,13 @@ public class EventController extends HttpServlet {
             String id = IDGenerator.generateEventID();
 
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
-            eventDAO.addEvent(e);
-            logDAO.log(user.getMemberID(), user.getName(), "CREATE", "EVENT", id, name,
-                    "Menambah kegiatan baru: " + name);
+            boolean success = eventDAO.addEvent(e);
+            if (success) {
+                logDAO.log(user.getMemberID(), user.getName(), "CREATE", "EVENT", id, name,
+                        "Menambah kegiatan baru: " + name);
+            } else {
+                System.err.println("[EventController] GAGAL menambah event: " + id + " - " + name);
+            }
 
             // Fitur Update Event
         } else if ("updateEvent".equals(action)) {
@@ -137,8 +141,12 @@ public class EventController extends HttpServlet {
             String picID = request.getParameter("picID");
 
             LabEvent e = new LabEvent(id, name, date, picID, "", description);
-            eventDAO.updateEvent(e);
-            logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "EVENT", id, name, "Mengupdate kegiatan: " + name);
+            boolean success = eventDAO.updateEvent(e);
+            if (success) {
+                logDAO.log(user.getMemberID(), user.getName(), "UPDATE", "EVENT", id, name, "Mengupdate kegiatan: " + name);
+            } else {
+                System.err.println("[EventController] GAGAL update event: " + id);
+            }
 
             // Fitur Hapus Event
         } else if ("deleteEvent".equals(action)) {
